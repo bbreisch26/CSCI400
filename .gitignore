@@ -1,5 +1,12 @@
+#OCaml files
 *.o
 *.cmi
 *.cmx
 lab0
+
+#IDE Cruft
+.project
+.vscode/
+.idea/
+
 
