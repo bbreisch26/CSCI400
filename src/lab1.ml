@@ -113,15 +113,25 @@ let append_tests =
 let reverse_tests =
   ("reverse", reverse, (=), (=), Some(str_int_list,str_int_list),
    [
-     (Some("simple list"), [1;2;3;4;5], Ok[5;4;3;2;1]);
+     (Some("simple list 1"), [1;2;3;4;5], Ok[5;4;3;2;1]);
        (* TODO: Add more tests *)
+     (Some("simple list 2"), [1;2], Ok[2;1]);
+     (Some("simple list 3"), [1;2;3], Ok[3;2;1]);
+     (Some("longer list"), [1;2;3;4;5;6;7;8;9], Ok[9;8;7;6;5;4;3;2;1]);
+     (Some("list with 1 element"), [1], Ok[1]);
+     (Some("empty list"), [], Ok[]);
   ])
 
 let length_tests =
   ("length", length, (=), (=), Some(str_int_list,string_of_int),
    [
-     (Some("simple list"), [1;2;3;4;5], Ok 5);
+     (Some("simple list 1"), [1;2;3;4;5], Ok 5);
        (* TODO: Add more tests *)
+     (Some("simple list 2"), [1;2], Ok 2);
+     (Some("simple list 3"), [1;2;3], Ok 3);
+     (Some("longer list"), [1;2;3;4;5;6;7;8;9;10;11;12;13;14], Ok 14);
+     (Some("small list"), [1], Ok 1);
+     (Some("empty list"), [], Ok 0);
   ])
 
 let list_prefix_tests =
