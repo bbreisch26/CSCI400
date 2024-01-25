@@ -71,7 +71,11 @@ let rec merge (cmp : 'a->'a->bool) (l1 : 'a list) (l2 : 'a list) : 'a list =
 
 let rec mergesort (cmp : 'a->'a->bool) (l:'a list) : 'a list =
   (* TODO, replace [] *)
-  []
+  let len = length l in
+  match len with
+  | 0 -> []
+  | 1 -> l
+  | _ -> merge cmp (mergesort cmp (list_prefix (len/2) l)) (mergesort cmp (list_suffix (len/2) l)) 
 
 
 (***********)
@@ -79,6 +83,7 @@ let rec mergesort (cmp : 'a->'a->bool) (l:'a list) : 'a list =
 (***********)
 
 (* See description in testing.ml *)
+
 
 let nth_tests =
   ("Nth", (fun (i,l)->nth i l), (=), (=),
@@ -174,5 +179,11 @@ let mergesort_tests =
         str_int_list),
    [
      (Some("simple list"), ((<),[1;3;4;2;5]), Ok [1;2;3;4;5]);
-     (* TODO: Add more tests *)
+     (* DONE: Add more tests *)
+     (Some("descending order"), ((>),[1;3;4;2;5]), Ok [5;4;3;2;1]);
+     (Some("empty list"), ((<),[]), Ok[]);
+     (Some("already descending order"), ((<),[5;4;3;2;1]), Ok [1;2;3;4;5]);
+     (Some("duplicates"), ((<),[5;5;4;4;3;2;1]), Ok [1;2;3;4;4;5;5]);
+     (Some("already sorted"), ((<),[1;2;3;4;5;6;7;8;9;10]), Ok [1;2;3;4;5;6;7;8;9;10]);
+     (Some("negative elements"), ((<),[1;3;4;2;5;-23;-99;-3;-1]), Ok [-99;-23;-3;-1;1;2;3;4;5]);
    ])
