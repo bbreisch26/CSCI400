@@ -15,13 +15,11 @@ let rec nth (i : int)  (l: 'a list) : 'a =
 
 (* Append two lists *)
 let rec append (l1 : 'a list) (l2: 'a list) : 'a list =
-  []
-  (*
   match (l1, l2) with
     | ([], _) -> l2
     | (_, []) -> l1
-    | (first1::rest1, first2::rest2) -> append (first1::rest1::first2) (rest2)
-  *)
+    | (first1::rest1, first2::rest2) -> first1::append (rest1) (l2)
+  
 
 (* Reverse a list *)
 let rec reverse (l : 'a list) : 'a list =
