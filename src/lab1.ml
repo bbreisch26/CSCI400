@@ -22,18 +22,19 @@ let rec append (l1 : 'a list) (l2: 'a list) : 'a list =
   
 
 (* Reverse a list *)
-let rec reverse (l : 'a list) : 'a list =
-  (* TODO, replace [] *)
-  []
+let reverse (l : 'a list) : 'a list =
+  let rec tail_reverse (l1 : 'a list) (l2: 'a list) : 'a list =
+    match l1 with
+      | [] -> l2
+      | first::rest -> tail_reverse (rest) (first::l2)
+  in tail_reverse (l) ([])
+
 
 (* Length of a list *)
 let rec length (l : 'a list) : int  =
-  (*
   match l with
     | [] -> 0
     | first::rest -> 1 + length (rest)
-  *)
-  0
 
 
 (* Return the part of list l beginning at index 0 and ending at index
