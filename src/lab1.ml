@@ -168,5 +168,11 @@ let mergesort_tests =
         str_int_list),
    [
      (Some("simple list"), ((<),[1;3;4;2;5]), Ok [1;2;3;4;5]);
-     (* TODO: Add more tests *)
+     (* DONE: Add more tests *)
+     (Some("descending order"), ((>),[1;3;4;2;5]), Ok [5;4;3;2;1]);
+     (Some("empty list"), ((<),[]), Ok[]);
+     (Some("already descending order"), ((<),[5;4;3;2;1]), Ok [1;2;3;4;5]);
+     (Some("duplicates"), ((<),[5;5;4;4;3;2;1]), Ok [1;2;3;4;4;5;5]);
+     (Some("already sorted"), ((<),[1;2;3;4;5;6;7;8;9;10]), Ok [1;2;3;4;5;6;7;8;9;10]);
+     (Some("negative elements"), ((<),[1;3;4;2;5;-23;-99;-3;-1]), Ok [-99;-23;-3;-1;1;2;3;4;5]);
    ])
