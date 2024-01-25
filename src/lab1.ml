@@ -62,7 +62,11 @@ let rec merge (cmp : 'a->'a->bool) (l1 : 'a list) (l2 : 'a list) : 'a list =
 
 let rec mergesort (cmp : 'a->'a->bool) (l:'a list) : 'a list =
   (* TODO, replace [] *)
-  []
+  let len = length l in
+  match len with
+  | 0 -> []
+  | 1 -> l
+  | _ -> merge cmp (mergesort cmp (list_prefix (len/2) l)) (mergesort cmp (list_suffix (len/2) l)) 
 
 
 (***********)
@@ -70,6 +74,7 @@ let rec mergesort (cmp : 'a->'a->bool) (l:'a list) : 'a list =
 (***********)
 
 (* See description in testing.ml *)
+
 
 let nth_tests =
   ("Nth", (fun (i,l)->nth i l), (=), (=),
