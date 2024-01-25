@@ -15,17 +15,26 @@ let rec nth (i : int)  (l: 'a list) : 'a =
 
 (* Append two lists *)
 let rec append (l1 : 'a list) (l2: 'a list) : 'a list =
-  (* TODO, replace [] *)
   []
+  (*
+  match (l1, l2) with
+    | ([], _) -> l2
+    | (_, []) -> l1
+    | (first1::rest1, first2::rest2) -> append (first1::rest1::first2) (rest2)
+  *)
 
 (* Reverse a list *)
-let reverse (l : 'a list) : 'a list =
+let rec reverse (l : 'a list) : 'a list =
   (* TODO, replace [] *)
   []
 
 (* Length of a list *)
-let length (l : 'a list) : int  =
-  (* TODO, replace 0 *)
+let rec length (l : 'a list) : int  =
+  (*
+  match l with
+    | [] -> 0
+    | first::rest -> 1 + length (rest)
+  *)
   0
 
 
@@ -77,9 +86,15 @@ let nth_tests =
    Some((fun x -> str_pair string_of_int str_int_list x),
         string_of_int),
    [
-     (Some("simple list"), (0, [1;2;3;4;5]), Ok 1);
-     (Some("error"), (-1, [1;2;3;4;5]), Error IndexError);
+     (Some("simple list 1"), (0, [1;2;3;4;5]), Ok 1);
+     (Some("negative index"), (-1, [1;2;3;4;5]), Error IndexError);
        (* TODO: Add more tests *)
+     (Some("simple list 2"), (3, [1;2;3;4;5]), Ok 4);
+     (Some("simple list 3"), (4, [1;2;3;4;5]), Ok 5);
+     (Some("simple list 4"), (0, [1]), Ok 1);
+     (Some("out of bounds"), (5, [1;2;3;4;5]), Error IndexError);
+     (Some("empty list"), (0, []), Error IndexError);
+
   ])
 
 let append_tests =
@@ -87,8 +102,14 @@ let append_tests =
    Some((fun x -> str_pair str_int_list  str_int_list x),
         str_int_list),
    [
-     (Some("simple list"), ([1;2],[3;4]), Ok [1;2;3;4]);
-       (* TODO: Add more tests *)
+     (Some("simple list 1"), ([1;2],[3;4]), Ok [1;2;3;4]);
+     (* TODO: Add more tests *)
+     (Some("simple list 2"), ([1;2;3],[3;4]), Ok [1;2;3;3;4]);
+     (Some("simple list 3"), ([1;2;3],[4]), Ok [1;2;3;4]);
+     (Some("simple list 4"), ([1],[2]), Ok [1;2]);
+     (Some("list 1 empty"), ([],[3;4]), Ok [3;4]);
+     (Some("list 2 empty"), ([1;2;3],[]), Ok [1;2;3]);
+     (Some("both lists empty"), ([],[]), Ok []);
   ])
 
 let reverse_tests =
