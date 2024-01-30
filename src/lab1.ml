@@ -53,7 +53,7 @@ let rec list_prefix (iend : int) (l : 'a list) : 'a list =
    the end of the list *)
 let rec list_suffix (istart : int) (l : 'a list) : 'a list =
   if istart < 0 then raise IndexError (*raise error if start is negative*)
-  else if istart >= List.length l then raise IndexError (*raise error if istart is out of l index*)
+  else if istart >= length l then raise IndexError (*raise error if istart is out of l index*)
   else if istart = 0 then l  (*Returns list at end of recursion*)
   else
     match l with
