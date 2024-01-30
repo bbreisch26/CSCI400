@@ -67,7 +67,12 @@ let rec list_suffix (istart : int) (l : 'a list) : 'a list =
    list containing all elements from both l2 and l2. *)
 let rec merge (cmp : 'a->'a->bool) (l1 : 'a list) (l2 : 'a list) : 'a list =
   (* TODO, replace [] *)
-  []
+    match (l1, l2) with
+    | ([], []) -> []
+    | ([], _) -> l2
+    | (_, []) -> l1
+    | (firstl1::restl1, firstl2::restl2) -> if cmp (firstl1) (firstl2) then firstl1::merge (cmp) (restl1) (l2)
+                else firstl2::merge (cmp) (l1) (restl2)
 
 (* Sort list l via mergesort
 
@@ -159,6 +164,7 @@ let list_prefix_tests =
      (None, (-1,[1;2;3;4;5]), Error IndexError);
      (None, (6,[1;2;3;4;5]), Error IndexError);
      (None, (10,[1;2;3;4;5]), Error IndexError);
+     (None, (1,[]), Error IndexError);
   ])
 
 let list_suffix_tests =
@@ -181,7 +187,12 @@ let merge_tests =
         str_int_list),
    [
      (Some("simple list"), ((<),[1;3],[2;4;5]), Ok [1;2;3;4;5]);
-       (* TODO: Add more tests *)
+     (* TODO: Add more tests *)
+     (Some("empty lists"), ((>),([]),([])), Ok []);
+     (Some("empty first list"), ((>), ([]), ([1;2;4;5;7])), Ok [1;2;4;5;7]);
+     (Some("empty second list"), ((>), ([1;2;3;4;5]), ([])), Ok [1;2;3;4;5]);
+     (Some("same values on lists"), ((<), ([1;2;3;4;5]), ([1;2;3;4;5])), Ok [1;1;2;2;3;3;4;4;5;5]);
+     (Some("long lists"), ((<), ([1;2;4;7;8;9;13;14]), ([3;5;6;10;11;12;15])), Ok [1;2;3;4;5;6;7;8;9;10;11;12;13;14;15]);
   ])
 
 
