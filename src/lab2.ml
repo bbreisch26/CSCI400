@@ -7,8 +7,10 @@ open Util (* see util.ml *)
 (*** Implementing higher-order functions ***)
 
 let rec map (f : 'a->'b) (l : 'a list) : 'b list =
-  (* TODO, replace [] *)
-  []
+  (* DONE, replace [] *)
+  match l with
+  | [] -> []
+  | first::rest -> f (first)::map (f) (rest)
 
 let rec filter (f : 'a->bool) (l : 'a list) : 'a list =
   (* TODO, replace l *)
@@ -117,6 +119,11 @@ let map_tests =
    [
      (Some("simple list"), ((fun x -> 1+x), [1;2;3;4;5]), Ok [2;3;4;5;6]);
        (* TODO: Add more tests *)
+     (Some("simple list multiplication"), ((fun x -> x*2), [1;2;3;4;5]), Ok [2;4;6;8;10]);
+     (Some("empty list"), ((fun x -> x+1), []), Ok []);
+     (Some("long list addition of 5"), ((fun x -> x+5), [1;2;3;4;5;6;7;8;9;10]), Ok [6;7;8;9;10;11;12;13;14;15]);
+     (Some("simple list division"), ((fun x -> x/2), [2;4;6;8;10]), Ok [1;2;3;4;5]);
+     (Some("simple list subtraction"), ((fun x -> x-4), [10;15;20;25;30]), Ok [6;11;16;21;26]);
   ])
 
 let filter_tests =
