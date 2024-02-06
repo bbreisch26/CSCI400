@@ -37,13 +37,12 @@ let append (l1 : 'a list) (l2 : 'a list) : 'a list =
 
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
 let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  fold_left (fun y -> fun x -> x::y) l2 11
+  fold_left (fun y -> fun x -> x::y) l2 l1
 
 (* Concatenate a list of lists. *)
 let flatten (l : 'a list list) : 'a list =
   (* TODO, replace [] *)
-  []
-
+  fold_right (fun y x -> (fold_right(fun y x -> y::x)(x)(y))) ([]) (l)
 
 (* Insertion Sort *)
 
@@ -156,7 +155,7 @@ let fold_right_tests =
    [
      (Some("+"), ((+), 0, [1;2;3]), Ok 6);
      (Some("-"), ((-), 0, [1;2;3]), Ok 2);
-     (* TODO: Add more tests *)
+     (* DONE: Add more tests *)
      (Some("+ with initial val"), ((+), 6, [1;2;3]), Ok 12);
      (Some("- with initial val"), ((-), 6, [1;2;3]), Ok (-4));
      (Some("Quiz6Question5"), ((fun a b -> a), 0, [1;2;3]), Ok (1));
@@ -192,6 +191,11 @@ let flatten_tests =
      (Some("simple list"), [[1;2];[3;4]], Ok [1;2;3;4]);
      (Some("simple list 2"), [[3;4]; [1;2]], Ok [3;4;1;2]);
      (* TODO: Add more tests *)
+     (Some("longer list"), [[1;2];[3;4];[5;6];[7;8]], Ok [1;2;3;4;5;6;7;8]);
+     (Some("empty list"), [], Ok []);
+     (Some("list with empty lists"), [[1;2;3];[4;5];[];[6;7]], Ok [1;2;3;4;5;6;7]);
+     (Some("list full of empty lists"), [[];[];[];[]], Ok []);
+     (Some("list with lists of similar values"), [[1;2];[1;2];[1;2];[1;2]], Ok [1;2;1;2;1;2;1;2]);
    ]
   )
 
