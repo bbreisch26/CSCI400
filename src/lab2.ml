@@ -38,8 +38,7 @@ let append (l1 : 'a list) (l2 : 'a list) : 'a list =
 
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
 let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  (* TODO, replace [] *)
-  []
+  fold_left (fun y -> fun x -> x::y) l2 11
 
 (* Concatenate a list of lists. *)
 let flatten (l : 'a list list) : 'a list =
