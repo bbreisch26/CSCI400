@@ -15,8 +15,9 @@ let rec filter (f : 'a->bool) (l : 'a list) : 'a list =
   l
 
 let rec fold_left (f: 'y ->'x->'y) (y:'y) (l:'x list) : 'y =
-  (* TODO, replace y *)
-  y
+  match l with
+  | [] -> y
+  | first::rest -> (fold_left f (f y first) rest) 
 
 let rec fold_right (f : 'x->'y->'y) (y:'y) (l:'x list) : 'y =
   (* TODO, replace y *)
@@ -28,8 +29,8 @@ let rec fold_right (f : 'x->'y->'y) (y:'y) (l:'x list) : 'y =
 
 (* Concatenate two lists. *)
 let append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  (* TODO, replace [] *)
-  []
+  fold-left (let cons y x = x) l2 l1
+  
 
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
 let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
@@ -135,6 +136,8 @@ let fold_left_tests =
    [
      (Some("+"), ((+), 0, [1;2;3]), Ok 6);
      (Some("-"), ((-), 0, [1;2;3]), Ok (-6));
+     (Some("+.init"), ((+), 2, [1;2;3;]), Ok 8);
+     (*(Some("append"), (((fun cons x y -> x::y)), [1;2;3;], [4;5;6;]), Ok [1;2;3;4;5;6;]);*)
        (* TODO: Add more tests *)
   ])
 
