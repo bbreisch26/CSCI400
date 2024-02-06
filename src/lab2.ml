@@ -31,13 +31,12 @@ let rec fold_right (f : 'x->'y->'y) (y:'y) (l:'x list) : 'y =
 
 (* Concatenate two lists. *)
 let append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  fold-left (let cons y x = x) l2 l1
+  fold_right (fun y -> fun x -> y::x) l2 l1
   
 
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
 let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  (* TODO, replace [] *)
-  []
+  fold_left (fun y -> fun x -> x::y) l2 11
 
 (* Concatenate a list of lists. *)
 let flatten (l : 'a list list) : 'a list =
