@@ -13,8 +13,14 @@ let rec map (f : 'a->'b) (l : 'a list) : 'b list =
   | first::rest -> f (first)::map (f) (rest)
 
 let rec filter (f : 'a->bool) (l : 'a list) : 'a list =
-  (* TODO, replace l *)
-  l
+  match l with
+      [] ->                                 (*If list is empty*)
+        []                                  (*Return empty list/end recursion*)
+     | firstl::restl   ->
+        if f firstl                         (*If f is true for first element*)
+            then firstl::filter f restl     (*Cons first with rest of filtered list, start recursiin*)
+        else                                (*Else*)
+            filter f restl                  (*Begin recurion on rest of list*)
 
 let rec fold_left (f: 'y ->'x->'y) (y:'y) (l:'x list) : 'y =
   match l with
@@ -38,6 +44,7 @@ let append (l1 : 'a list) (l2 : 'a list) : 'a list =
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
 let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
   fold_left (fun y x -> x::y) l2 l1
+
 
 (* Concatenate a list of lists. *)
 let flatten (l : 'a list list) : 'a list =
@@ -133,7 +140,13 @@ let filter_tests =
         str_int_list),
    [
      (Some("simple list"), ((fun x -> (x mod 2)=0), [1;2;3;4;5]), Ok [2;4]);
-       (* TODO: Add more tests *)
+     
+     (Some("empty list"), ((fun x -> (x mod 2)=0), []), Ok []);
+     (Some("true even list"), ((fun x -> (x mod 2)=0), [2;4;6;8]), Ok [2;4;6;8]);
+     (Some("false even list"), ((fun x -> (x mod 2)=0), [1;3;5;7;9]), Ok []);
+     (Some("false odd list"), ((fun x -> (x mod 2)=1), [12;8;26;44]), Ok []);
+     (Some("true odd list"), ((fun x -> (x mod 2)=1), [11;31;25;17;29]), Ok [11;31;25;17;29]);
+     (Some("different f list"), ((fun x -> (x >=4)), [2;1;7;12;4]), Ok [7;12;4]);
   ])
 
 let fold_left_tests =
