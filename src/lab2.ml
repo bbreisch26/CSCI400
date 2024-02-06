@@ -32,13 +32,12 @@ let rec fold_right (f : 'x->'y->'y) (y:'y) (l:'x list) : 'y =
 
 (* Concatenate two lists. *)
 let append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  (*fold_left (let cons y x = x) l2 l1*)
-  []
+  fold_right (fun y x -> y::x) l2 l1
   
 
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
 let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  fold_left (fun y -> fun x -> x::y) l2 11
+  fold_left (fun y x -> x::y) l2 l1
 
 (* Concatenate a list of lists. *)
 let flatten (l : 'a list list) : 'a list =
@@ -144,9 +143,10 @@ let fold_left_tests =
    [
      (Some("+"), ((+), 0, [1;2;3]), Ok 6);
      (Some("-"), ((-), 0, [1;2;3]), Ok (-6));
-     (Some("+.init"), ((+), 2, [1;2;3;]), Ok 8);
-     (*(Some("append"), (((fun cons x y -> x::y)), [1;2;3;], [4;5;6;]), Ok [1;2;3;4;5;6;]);*)
-       (* TODO: Add more tests *)
+     (* TODO: Add more tests *)
+     (Some("+.init"), ((+), 2, [1;2;3]), Ok 8);
+     (Some("empty"), ((+), 0, []), Ok 0);
+     (*Some("strRevAppend"), ((fun y x -> y::x), [1;2], [3;4]), Ok [2;1;3;4]);*)
 
   ])
 
@@ -175,6 +175,10 @@ let append_tests =
         str_int_list),
    [
      (Some("simple list"), ([1;2],[3;4]), Ok [1;2;3;4]);
+     (Some("empty list"), ([1;2],[]), Ok [1;2]);
+     (Some("both empty"), ([],[]), Ok []);
+     (Some("different sizes"), ([1;2;3],[4;5;6;7;8;9]), Ok [1;2;3;4;5;6;7;8;9]);
+     (Some("same elements"), ([1],[1]), Ok [1;1]);
        (* TODO: Add more tests *)
   ])
 
