@@ -23,8 +23,8 @@ let rec fold_left (f: 'y ->'x->'y) (y:'y) (l:'x list) : 'y =
 
 let rec fold_right (f : 'x->'y->'y) (y:'y) (l:'x list) : 'y =
   match l with
-    | [] -> y
-    | first::rest -> f (first) (fold_right (f) (y) (rest))
+  | [] -> y
+  | first::rest -> f (first) (fold_right (f) (y) (rest))
 
 
 (*** Using higher-order functions ***)
@@ -32,7 +32,8 @@ let rec fold_right (f : 'x->'y->'y) (y:'y) (l:'x list) : 'y =
 
 (* Concatenate two lists. *)
 let append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  fold-left (let cons y x = x) l2 l1
+  (*fold_left (let cons y x = x) l2 l1*)
+  []
   
 
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
@@ -164,6 +165,8 @@ let fold_right_tests =
      (Some("Quiz6Question7"), ((fun a b -> b), 0, [1;2;3]), Ok (0));
      (Some("+ empty list"), ((+), 6, []), Ok 6);
      (Some("- empty list"), ((-), 6, []), Ok 6);
+     (Some("*"), (( * ), 6, [1;2;3]), Ok 36);
+     (Some("/"), (( / ), 5, [10;20;50]), Ok 5);
   ])
 
 
