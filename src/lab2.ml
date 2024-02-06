@@ -19,8 +19,9 @@ let rec fold_left (f: 'y ->'x->'y) (y:'y) (l:'x list) : 'y =
   y
 
 let rec fold_right (f : 'x->'y->'y) (y:'y) (l:'x list) : 'y =
-  (* TODO, replace y *)
-  y
+  match l with
+    | [] -> y
+    | first::rest -> f (first) (fold_right (f) (y) (rest))
 
 
 (*** Using higher-order functions ***)
@@ -136,6 +137,7 @@ let fold_left_tests =
      (Some("+"), ((+), 0, [1;2;3]), Ok 6);
      (Some("-"), ((-), 0, [1;2;3]), Ok (-6));
        (* TODO: Add more tests *)
+
   ])
 
 let fold_right_tests =
@@ -146,6 +148,12 @@ let fold_right_tests =
      (Some("+"), ((+), 0, [1;2;3]), Ok 6);
      (Some("-"), ((-), 0, [1;2;3]), Ok 2);
      (* TODO: Add more tests *)
+     (Some("+ with initial val"), ((+), 6, [1;2;3]), Ok 12);
+     (Some("- with initial val"), ((-), 6, [1;2;3]), Ok (-4));
+     (Some("Quiz6Question5"), ((fun a b -> a), 0, [1;2;3]), Ok (1));
+     (Some("Quiz6Question7"), ((fun a b -> b), 0, [1;2;3]), Ok (0));
+     (Some("+ empty list"), ((+), 6, []), Ok 6);
+     (Some("- empty list"), ((-), 6, []), Ok 6);
   ])
 
 
