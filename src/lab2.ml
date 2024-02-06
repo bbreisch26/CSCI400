@@ -13,8 +13,14 @@ let rec map (f : 'a->'b) (l : 'a list) : 'b list =
   | first::rest -> f (first)::map (f) (rest)
 
 let rec filter (f : 'a->bool) (l : 'a list) : 'a list =
-  (* TODO, replace l *)
-  l
+  match l with
+      [] ->                                 (*If list is empty*)
+        []                                  (*Return empty list/end recursion*)
+     | firstl::restl   ->
+        if f firstl                         (*If f is true for first element*)
+            then firstl::filter f restl     (*Cons first with rest of filtered list, start recursiin*)
+        else                                (*Else*)
+            filter f restl                  (*Begin recurion on rest of list*)
 
 let rec fold_left (f: 'y ->'x->'y) (y:'y) (l:'x list) : 'y =
   match l with
@@ -23,8 +29,8 @@ let rec fold_left (f: 'y ->'x->'y) (y:'y) (l:'x list) : 'y =
 
 let rec fold_right (f : 'x->'y->'y) (y:'y) (l:'x list) : 'y =
   match l with
-    | [] -> y
-    | first::rest -> f (first) (fold_right (f) (y) (rest))
+  | [] -> y
+  | first::rest -> f (first) (fold_right (f) (y) (rest))
 
 
 (*** Using higher-order functions ***)
@@ -32,12 +38,17 @@ let rec fold_right (f : 'x->'y->'y) (y:'y) (l:'x list) : 'y =
 
 (* Concatenate two lists. *)
 let append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  fold_right (fun y -> fun x -> y::x) l2 l1
+  fold_right (fun y x -> y::x) l2 l1
   
 
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
 let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
+<<<<<<< HEAD
   fold_left (fun y -> fun x -> x::y) l2 l1
+=======
+  fold_left (fun y x -> x::y) l2 l1
+
+>>>>>>> c35aa836a525f0442a814b8ecdb75f69141c2191
 
 (* Concatenate a list of lists. *)
 let flatten (l : 'a list list) : 'a list =
@@ -132,7 +143,13 @@ let filter_tests =
         str_int_list),
    [
      (Some("simple list"), ((fun x -> (x mod 2)=0), [1;2;3;4;5]), Ok [2;4]);
-       (* TODO: Add more tests *)
+     
+     (Some("empty list"), ((fun x -> (x mod 2)=0), []), Ok []);
+     (Some("true even list"), ((fun x -> (x mod 2)=0), [2;4;6;8]), Ok [2;4;6;8]);
+     (Some("false even list"), ((fun x -> (x mod 2)=0), [1;3;5;7;9]), Ok []);
+     (Some("false odd list"), ((fun x -> (x mod 2)=1), [12;8;26;44]), Ok []);
+     (Some("true odd list"), ((fun x -> (x mod 2)=1), [11;31;25;17;29]), Ok [11;31;25;17;29]);
+     (Some("different f list"), ((fun x -> (x >=4)), [2;1;7;12;4]), Ok [7;12;4]);
   ])
 
 let fold_left_tests =
@@ -142,9 +159,10 @@ let fold_left_tests =
    [
      (Some("+"), ((+), 0, [1;2;3]), Ok 6);
      (Some("-"), ((-), 0, [1;2;3]), Ok (-6));
-     (Some("+.init"), ((+), 2, [1;2;3;]), Ok 8);
-     (*(Some("append"), (((fun cons x y -> x::y)), [1;2;3;], [4;5;6;]), Ok [1;2;3;4;5;6;]);*)
-       (* TODO: Add more tests *)
+     (* TODO: Add more tests *)
+     (Some("+.init"), ((+), 2, [1;2;3]), Ok 8);
+     (Some("empty"), ((+), 0, []), Ok 0);
+     (*Some("strRevAppend"), ((fun y x -> y::x), [1;2], [3;4]), Ok [2;1;3;4]);*)
 
   ])
 
@@ -162,6 +180,8 @@ let fold_right_tests =
      (Some("Quiz6Question7"), ((fun a b -> b), 0, [1;2;3]), Ok (0));
      (Some("+ empty list"), ((+), 6, []), Ok 6);
      (Some("- empty list"), ((-), 6, []), Ok 6);
+     (Some("*"), (( * ), 6, [1;2;3]), Ok 36);
+     (Some("/"), (( / ), 5, [10;20;50]), Ok 5);
   ])
 
 
@@ -171,6 +191,10 @@ let append_tests =
         str_int_list),
    [
      (Some("simple list"), ([1;2],[3;4]), Ok [1;2;3;4]);
+     (Some("empty list"), ([1;2],[]), Ok [1;2]);
+     (Some("both empty"), ([],[]), Ok []);
+     (Some("different sizes"), ([1;2;3],[4;5;6;7;8;9]), Ok [1;2;3;4;5;6;7;8;9]);
+     (Some("same elements"), ([1],[1]), Ok [1;1]);
        (* TODO: Add more tests *)
   ])
 
@@ -201,8 +225,14 @@ let flatten_tests =
 
 
 let sort_test_cases = [
-    (Some("simple list"), ((<),[1;3;4;2;5]), Ok [1;2;3;4;5]);
+    (Some("simple list 1<"), ((<),[1;3;4;2;5]), Ok [1;2;3;4;5]);
     (* TODO: Add more tests *)
+    (Some("simple list 1>"), ((>),[1;3;4;2;5]), Ok [5;4;3;2;1]);
+    (Some("simple list 2<"), ((<),[9;1;3;6;4;2;5]), Ok [1;2;3;4;5;6;9]);
+    (Some("simple list 3<"), ((<),[4;3;4;1;2;1]), Ok [1;1;2;3;4;4]);
+    (Some("simple list 3>"), ((>),[4;3;4;1;2;1]), Ok [4;4;3;2;1;1]);
+    (Some("empty list"), ((<),[]), Ok []);
+    (Some("list with repeated vals"), ((>),[1;1;1;1]), Ok [1;1;1;1]);
   ]
 
 let insert_tests =
