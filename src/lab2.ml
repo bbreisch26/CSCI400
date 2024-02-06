@@ -200,8 +200,14 @@ let flatten_tests =
 
 
 let sort_test_cases = [
-    (Some("simple list"), ((<),[1;3;4;2;5]), Ok [1;2;3;4;5]);
+    (Some("simple list 1<"), ((<),[1;3;4;2;5]), Ok [1;2;3;4;5]);
     (* TODO: Add more tests *)
+    (Some("simple list 1>"), ((>),[1;3;4;2;5]), Ok [5;4;3;2;1]);
+    (Some("simple list 2<"), ((<),[9;1;3;6;4;2;5]), Ok [1;2;3;4;5;6;9]);
+    (Some("simple list 3<"), ((<),[4;3;4;1;2;1]), Ok [1;1;2;3;4;4]);
+    (Some("simple list 3>"), ((>),[4;3;4;1;2;1]), Ok [4;4;3;2;1;1]);
+    (Some("empty list"), ((<),[]), Ok []);
+    (Some("list with repeated vals"), ((>),[1;1;1;1]), Ok [1;1;1;1]);
   ]
 
 let insert_tests =
