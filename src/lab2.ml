@@ -43,12 +43,7 @@ let append (l1 : 'a list) (l2 : 'a list) : 'a list =
 
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
 let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
-<<<<<<< HEAD
-  fold_left (fun y -> fun x -> x::y) l2 l1
-=======
   fold_left (fun y x -> x::y) l2 l1
-
->>>>>>> c35aa836a525f0442a814b8ecdb75f69141c2191
 
 (* Concatenate a list of lists. *)
 let flatten (l : 'a list list) : 'a list =
@@ -89,14 +84,23 @@ let rec selectionsort (cmp : 'a->'a->bool) (l:'a list) : 'a list =
 (* Partion list l around elt.  Return a tuple consisting of all
    elements before elt and all elements after elt. *)
 let pivot (cmp : 'a->'a->bool) (elt :'a) (l:'a list) : 'a list * 'a list =
-  (* TODO, replace ([],[]) *)
-  ([], [])
+  let fold_fn (left, right) x =
+    if (cmp x elt) then (x :: left, right)
+    else (left, x::right)
+  in
+  fold_left fold_fn ([],[]) l 
 
 (* The simple implementation of quicksort recurses on the two sublists
    and appends the sorted results. *)
 let rec quicksort_simple (cmp : 'a->'a->bool) (l : 'a list) : 'a list =
   (* TODO, replace l *)
-  l
+  match l with
+  | [] | _::[] as l -> l
+  | first::rest -> begin
+      let (left,right) = (pivot cmp first l) in
+      let left_sorted = (quicksort_simple cmp left) in
+      let right_sorted = (quicksort_simple cmp right) in
+      (append left_sorted right_sorted) end
 
 (* The better implementation of quicksort elides the append by passing
    a "tail" list to recursive calls.  Sorted results are directly
@@ -162,6 +166,10 @@ let fold_left_tests =
      (* TODO: Add more tests *)
      (Some("+.init"), ((+), 2, [1;2;3]), Ok 8);
      (Some("empty"), ((+), 0, []), Ok 0);
+     (Some("*"), (( * ), 1, [1;2;3]), Ok 6);
+     (Some("/"), (( / ), 100, [5;10]), Ok 2);
+     (Some("lambdaOp"), ((fun a b -> a), 0, [1;2;3;4;5]), Ok 0);
+     
      (*Some("strRevAppend"), ((fun y x -> y::x), [1;2], [3;4]), Ok [2;1;3;4]);*)
 
   ])
@@ -191,11 +199,12 @@ let append_tests =
         str_int_list),
    [
      (Some("simple list"), ([1;2],[3;4]), Ok [1;2;3;4]);
-     (Some("empty list"), ([1;2],[]), Ok [1;2]);
+     
+     (Some("one empty"), ([1;2],[]), Ok [1;2]);
      (Some("both empty"), ([],[]), Ok []);
      (Some("different sizes"), ([1;2;3],[4;5;6;7;8;9]), Ok [1;2;3;4;5;6;7;8;9]);
      (Some("same elements"), ([1],[1]), Ok [1;1]);
-       (* TODO: Add more tests *)
+     (Some("other empty"), ([],[1;2;3]), Ok [1;2;3]);
   ])
 
 let rev_append_tests =
@@ -204,7 +213,12 @@ let rev_append_tests =
         str_int_list),
    [
      (Some("simple list"), ([1;2],[3;4]), Ok [2;1;3;4]);
-       (* TODO: Add more tests *)
+     (* TODO: Add more tests *)
+     (Some("dupes"), ([1;2],[1;2]), Ok [2;1;1;2]);
+     (Some("2empty"), ([],[]), Ok []);
+     (Some("1empty"), ([1;2],[]), Ok [2;1]);
+     (Some("diff sizes"), ([1], [1;2;3;4;5;6]), Ok [1;1;2;3;4;5;6]);
+     (Some("otherempty"), ([],[1;2;3]), Ok [1;2;3]);
   ])
 
 let flatten_tests =
@@ -286,7 +300,11 @@ let pivot_tests =
    [
      (Some("simple <"), ((<), 0, [-1;1;0;-2; 2]), Ok ([-2; -1],[2; 0; 1]));
      (Some("simple >"), ((>), 0, [-1;1;0;-2; 2]), Ok ([2; 1], [-2; 0; -1]));
-     (* TODO: Add more tests *)
+     (Some("empty list"), ((<), 0, []), Ok ([],[]));
+     (Some("dupes"), ((<), 0, [-1;1;0;0;-2;0;2]), Ok ([-2; -1], [2; 0; 0; 0; 1;]));
+     (Some("different pivot"), ((>), 2, [1;2;3;4;5]), Ok([5;4;3],[1;2]));
+     (Some("all less than pivot"), ((<), 5, [1;2;3;4;5]), Ok([4;3;2;1;],[5]));
+     (Some("all greater than pivot"), ((<), 1, [1;2;3;4;5]), Ok([],[1;2;3;4;5]));
   ])
 
 let quicksort_simple_tests =
