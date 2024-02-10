@@ -97,10 +97,8 @@ let rec quicksort_simple (cmp : 'a->'a->bool) (l : 'a list) : 'a list =
   match l with
   | [] | _::[] as l -> l
   | first::rest -> begin
-      let (left,right) = (pivot cmp first l) in
-      let left_sorted = (quicksort_simple cmp left) in
-      let right_sorted = (quicksort_simple cmp right) in
-      (append left_sorted right_sorted) end
+      let (left,right) = (pivot cmp first rest) in
+      (append (append (quicksort_simple cmp left) [first]) (quicksort_simple cmp right)) end
 
 (* The better implementation of quicksort elides the append by passing
    a "tail" list to recursive calls.  Sorted results are directly
