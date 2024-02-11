@@ -14,9 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-
     - name: Install dependencies
-      run: make
+      run: apt install ocaml
 
     - name: Compile Lab
       run: make lab2
