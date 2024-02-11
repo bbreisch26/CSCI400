@@ -105,11 +105,13 @@ let rec quicksort_simple (cmp : 'a->'a->bool) (l : 'a list) : 'a list =
    cons'ed onto the tail, avoiding the need for an extra append. *)
 let quicksort_better (cmp : 'a->'a->bool) (l : 'a list) : 'a list =
   let rec f (cmp : 'a->'a->bool) (l : 'a list) (r : 'a list) : 'a list =
-    (* r is the tail: everything that must come after l in the sorted
-       list. Passing r to f saves us from having to append sorted
-       lists. *)
-    (* TODO, replace l @ r *)
-    l @ r
+    match l with
+    | [] -> r
+    | [element] -> element::r
+    | first::rest ->
+        let (left, right) = pivot cmp first rest in
+        let sorted_right = f (cmp) (right) (r) in
+        f (cmp) (left) (first::sorted_right)
   in f cmp l []
 
 (***********)
