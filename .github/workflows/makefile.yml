@@ -21,4 +21,4 @@ jobs:
       run: make lab2
       
     - name: Test Lab
-      run: ./lab2
+      run: ./ci-test.sh
