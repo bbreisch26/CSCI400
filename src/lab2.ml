@@ -71,12 +71,23 @@ let select (cmp : 'a->'a->bool) (l:'a list) : 'a * 'a list =
   match l with
   | [] -> invalid_arg "select"
   | a::d ->
-     (* TODO, replce (a,d) *)
-     (a,d)
+     (* DONE, replce (a,d) *)
+     fold_left (fun (min, rest) y ->
+       if cmp y min then
+         (y, min::rest)
+       else
+         (min, y::rest))
+     (a,[]) d 
+        
+       
 
 let rec selectionsort (cmp : 'a->'a->bool) (l:'a list) : 'a list =
-  (* TODO, replace l *)
-  l
+  (* DONE, replace l *)
+  match l with 
+  | [] -> []
+  | first::rest ->
+     let (a, d) = select cmp l in 
+       a::selectionsort (cmp) (d)
 
 
 (* Quicksort *)
@@ -278,7 +289,12 @@ let select_tests =
    [
      (Some("simple <"), ((<), [1;-1;2]), Ok (-1,[2;1]));
      (Some("simple >"), ((>), [1;-1;2]), Ok (2,[1;-1]));
-     (* TODO: Add more tests *)
+     (* DONE: Add more tests *)
+     (Some("< with duplicates"), ((<), [1;1;2;2;3;3;4;4]), Ok (1,[1;2;2;3;3;4;4]));
+     (Some("> with duplicates"), ((>), [1;1;2;2;3;3;4;4]), Ok (4,[1;1;2;2;3;3;4]));
+     (Some("< with all same values"), ((<), [1;1;1;1;1]), Ok (1,[1;1;1;1]));
+     (Some("> with all same values"), ((>), [2;2;2;2;2]), Ok (2,[2;2;2;2]));
+     (Some("list of one"), ((>), [1]), Ok (1,[]));
    ])
 
 
