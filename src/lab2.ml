@@ -43,7 +43,7 @@ let append (l1 : 'a list) (l2 : 'a list) : 'a list =
 
 (* rev_append l1 l2 reverses l1 and concatenates it with l2 *)
 let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
-  fold_left (fun y x -> x::y) l2 l1
+  fold_left (fun y -> fun x -> x::y) l2 l1
 
 (* Concatenate a list of lists. *)
 let flatten (l : 'a list list) : 'a list =
@@ -54,12 +54,17 @@ let flatten (l : 'a list list) : 'a list =
 
 (* Insert elt into sorted list l in sorted order *)
 let rec insert (cmp : 'a->'a->bool) (elt :'a) (l:'a list) : 'a list =
-  (* TODO, replace [] *)
-  []
+  match l with
+    | [] -> [elt]     (*If list is empty*)
+    | first::rest ->    (*If list is not empty*)
+      if cmp elt first then    (*Check is cmp is true for elt and first*)
+        elt::l   (*Cons in before first*)
+      else
+        first::(insert cmp elt rest)  (*Begin recursion looking for where cmp is true*)
 
 let insertionsort (cmp : 'a->'a->bool) (l:'a list) : 'a list =
-  (* TODO, replace l *)
-  l
+  fold_left (fun acc elt -> insert cmp elt acc) [] l
+
 
 
 (* Selection Sort *)
@@ -269,6 +274,12 @@ let insert_tests =
      (Some("simple <"), ((<), 0, [-1;1;2]), Ok ([-1; 0; 1; 2]));
      (Some("simple >"), ((>), 0, [2;1;-1]), Ok ([2; 1; 0; -1]));
      (* TODO: Add more tests *)
+     (Some("end element >"), ((>), -2, [2;1;-1]), Ok ([2; 1; -1; -2]));
+     (Some("start element <"), ((<), -2, [-1;1;2]), Ok ([-2; -1; 1; 2]));
+     (Some("start element >"), ((>), 3, [2;1;-1]), Ok ([3; 2; 1; -1]));
+     (Some("end element <"), ((<), 3, [-1;1;2]), Ok ([-1; 1; 2; 3]));
+     (Some("equal element <"), ((<), 1, [-1;1;2]), Ok ([-1; 1; 1; 2]));
+     (Some("equal element >"), ((>), 1, [2;1;-1]), Ok ([2; 1; 1; -1]));
    ])
 
 let insertionsort_tests =
