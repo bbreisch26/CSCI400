@@ -47,7 +47,7 @@ let rev_append (l1 : 'a list) (l2 : 'a list) : 'a list =
 
 (* Concatenate a list of lists. *)
 let flatten (l : 'a list list) : 'a list =
-  (* TODO, replace [] *)
+  (* DONE, replace [] *)
   fold_right (fun y x -> (fold_right(fun y x -> y::x)(x)(y))) ([]) (l)
 
 (* Insertion Sort *)
@@ -109,7 +109,7 @@ let pivot (cmp : 'a->'a->bool) (elt :'a) (l:'a list) : 'a list * 'a list =
 (* The simple implementation of quicksort recurses on the two sublists
    and appends the sorted results. *)
 let rec quicksort_simple (cmp : 'a->'a->bool) (l : 'a list) : 'a list =
-  (* TODO, replace l *)
+  (* DONE, replace l *)
   match l with
   | [] | _::[] as l -> l
   | first::rest -> begin
@@ -149,7 +149,7 @@ let map_tests =
         str_int_list),
    [
      (Some("simple list"), ((fun x -> 1+x), [1;2;3;4;5]), Ok [2;3;4;5;6]);
-       (* TODO: Add more tests *)
+       (* DONE: Add more tests *)
      (Some("simple list multiplication"), ((fun x -> x*2), [1;2;3;4;5]), Ok [2;4;6;8;10]);
      (Some("empty list"), ((fun x -> x+1), []), Ok []);
      (Some("long list addition of 5"), ((fun x -> x+5), [1;2;3;4;5;6;7;8;9;10]), Ok [6;7;8;9;10;11;12;13;14;15]);
@@ -179,15 +179,12 @@ let fold_left_tests =
    [
      (Some("+"), ((+), 0, [1;2;3]), Ok 6);
      (Some("-"), ((-), 0, [1;2;3]), Ok (-6));
-     (* TODO: Add more tests *)
+     (* DONE: Add more tests *)
      (Some("+.init"), ((+), 2, [1;2;3]), Ok 8);
      (Some("empty"), ((+), 0, []), Ok 0);
      (Some("*"), (( * ), 1, [1;2;3]), Ok 6);
      (Some("/"), (( / ), 100, [5;10]), Ok 2);
      (Some("lambdaOp"), ((fun a b -> a), 0, [1;2;3;4;5]), Ok 0);
-     
-     (*Some("strRevAppend"), ((fun y x -> y::x), [1;2], [3;4]), Ok [2;1;3;4]);*)
-
   ])
 
 let fold_right_tests =
@@ -229,7 +226,7 @@ let rev_append_tests =
         str_int_list),
    [
      (Some("simple list"), ([1;2],[3;4]), Ok [2;1;3;4]);
-     (* TODO: Add more tests *)
+     (* DONE: Add more tests *)
      (Some("dupes"), ([1;2],[1;2]), Ok [2;1;1;2]);
      (Some("2empty"), ([],[]), Ok []);
      (Some("1empty"), ([1;2],[]), Ok [2;1]);
@@ -244,7 +241,7 @@ let flatten_tests =
    [
      (Some("simple list"), [[1;2];[3;4]], Ok [1;2;3;4]);
      (Some("simple list 2"), [[3;4]; [1;2]], Ok [3;4;1;2]);
-     (* TODO: Add more tests *)
+     (* DONE: Add more tests *)
      (Some("longer list"), [[1;2];[3;4];[5;6];[7;8]], Ok [1;2;3;4;5;6;7;8]);
      (Some("empty list"), [], Ok []);
      (Some("list with empty lists"), [[1;2;3];[4;5];[];[6;7]], Ok [1;2;3;4;5;6;7]);
@@ -256,7 +253,7 @@ let flatten_tests =
 
 let sort_test_cases = [
     (Some("simple list 1<"), ((<),[1;3;4;2;5]), Ok [1;2;3;4;5]);
-    (* TODO: Add more tests *)
+    (* DONE: Add more tests *)
     (Some("simple list 1>"), ((>),[1;3;4;2;5]), Ok [5;4;3;2;1]);
     (Some("simple list 2<"), ((<),[9;1;3;6;4;2;5]), Ok [1;2;3;4;5;6;9]);
     (Some("simple list 3<"), ((<),[4;3;4;1;2;1]), Ok [1;1;2;3;4;4]);
@@ -273,7 +270,7 @@ let insert_tests =
    [
      (Some("simple <"), ((<), 0, [-1;1;2]), Ok ([-1; 0; 1; 2]));
      (Some("simple >"), ((>), 0, [2;1;-1]), Ok ([2; 1; 0; -1]));
-     (* TODO: Add more tests *)
+     (* DONE: Add more tests *)
      (Some("end element >"), ((>), -2, [2;1;-1]), Ok ([2; 1; -1; -2]));
      (Some("start element <"), ((<), -2, [-1;1;2]), Ok ([-2; -1; 1; 2]));
      (Some("start element >"), ((>), 3, [2;1;-1]), Ok ([3; 2; 1; -1]));
