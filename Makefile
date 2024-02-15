@@ -44,7 +44,10 @@ lab$(1): build/lab$(1).$(CMO) build/lab$(1)_main.$(CMO) build/testing.$(CMO) bui
 lab$(1)_test: lab$(1)
 	./lab$(1)
 
+ifneq (,$(wildcard ./src/lab$(1)_main.ml))
 LABS += lab$(1)
+endif
+
 endef
 
 ###########
@@ -53,18 +56,37 @@ endef
 
 $(eval $(call LAB_TEMPLATE,1))
 $(eval $(call LAB_TEMPLATE,2))
-$(eval $(call LAB_TEMPLATE,3))
-$(eval $(call LAB_TEMPLATE,4))
 
+# Lab 3
+build/lab3_main.$(CMO): build/util.$(CMO) build/testing.$(CMO) build/lab3_exp.$(CMO) build/lab3_rope.$(CMO) build/lab3_rbtree.$(CMO)
+build/lab3_exp.$(CMO): build/testing.$(CMO) build/util.$(CMO)
+build/lab3_rope.$(CMO): build/testing.$(CMO) build/util.$(CMO)
+build/lab3_rbtree.$(CMO): build/testing.$(CMO) build/util.$(CMO)
+
+lab3: build/lab3_main.$(CMO)
+	$(OCAMLC) $(OCAML_FLAGS) -o lab3 build/util.$(CMO) build/testing.$(CMO) build/lab3_exp.$(CMO) build/lab3_rope.$(CMO) build/lab3_rbtree.$(CMO) build/lab3_main.$(CMO)
+
+lab3_test: lab3
+	./lab3
+
+ifneq (,$(wildcard ./src/lab3_main.ml))
+LABS += lab3
+endif
+
+
+$(eval $(call LAB_TEMPLATE,4))
 
 ###########
 ## Lab 5 ##
 ###########
 
 build/javascript_lexer.ml: src/javascript_lexer.mll
+	@mkdir -p build
 	ocamllex -o $@ $<
 
+# TODO: add -v and --strict flags
 build/javascript_parser.ml: src/javascript_parser.mly
+	@mkdir -p build
 	cd build && ocamlyacc -bjavascript_parser ../src/javascript_parser.mly
 
 build/javascript_parser.$(CMI): build/javascript_parser.ml build/javascript_ast.$(CMO)
@@ -87,7 +109,9 @@ lab5: build/lab5_main.$(CMO) build/lab5_tests.$(CMO)
 lab5_test: lab5
 	./lab5 --test
 
+ifneq (,$(wildcard ./src/lab5_main.ml))
 LABS += lab5
+endif
 
 
 ####################
@@ -108,7 +132,9 @@ lab$(1): build/lab$(1)_main.$(CMO) build/lab$(1).$(CMO) $(JAVASCRIPT_EVAL_O)
 lab$(1)_test: lab$(1)
 	./lab$(1) --test
 
+ifneq (,$(wildcard ./src/lab$(1)_main.ml))
 LABS += lab$(1)
+endif
 
 endef
 
