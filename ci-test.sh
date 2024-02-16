@@ -1,7 +1,7 @@
 #! /bin/bash
 
 
-result=$(./lab2)
+result=$(./lab3)
 if echo $result | grep -q "FAIL"; then
 	echo "$result"
 	echo "Lab2 failed some tests, check output"
