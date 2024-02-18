@@ -46,8 +46,13 @@ module Exp = struct
     match e with
     | Num x -> x
     | BinExp(op,e1,e2) ->
-       (* TODO: Replace 0 *)
-       0
+       (* DONE: Replace 0 *)
+       match op with
+       | Add -> eval (e1) + eval (e2)
+       | Sub -> eval (e1) - eval (e2)
+       | Mul -> eval (e1) * eval (e2)
+       | Div -> if eval (e2) == 0 then invalid_arg "Division_by_zero"
+                 else eval (e1) / eval (e2)
 
   (* Convert the expression to a string.  The string must be fully
    parenthesized and contain no whitespace. *)
@@ -124,5 +129,10 @@ let exp_eval_tests =
      (Some "Simple Exp.Num", Exp.Num 1, Ok 1);
      (Some "Simple Exp", BinExp(Add, Exp.Num 1, Exp.Num 2), Ok 3);
      (Some "Exp Commutativity",  BinExp(Sub, Exp.Num 1, Exp.Num 2), Ok (-1));
-     (* TODO *)
+     (* DONE *)
+     (Some "Simple Exp with Op Mul", BinExp(Mul, Exp.Num 5, Exp.Num 6), Ok 30);
+     (Some "Simple Exp with Op Div", BinExp(Div, Exp.Num 30, Exp.Num 6), Ok 5);
+     (Some "Division by 0", BinExp(Div, Exp.Num 10, Exp.Num 0), Error (Invalid_argument "Division_by_zero"));
+     (Some "Multiplication of large numbers", BinExp(Mul, Exp.Num 413, Exp.Num 768), Ok 317184);
+     (Some "Mutiplication by 0", BinExp(Mul, Exp.Num 7927, Exp.Num 0), Ok 0);
    ])
