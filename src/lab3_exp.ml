@@ -17,10 +17,19 @@ module RPN = struct
   (* RPN evaluator.  Return the stack after evaluating commands. *)
   let eval (cmds : exp) : int list =
     List.fold_left
-      (fun stack cmd ->
-        (* TODO: replace [] *)
-        [])
-      [] cmds
+      (
+        fun stack cmd ->
+          match (stack, cmd) with
+          | (_, Num n) -> n::stack
+          | ([], Op o) -> invalid_arg "rpn"
+          | (first::[], Op o) -> invalid_arg "rpn"
+          | (first::second::rest, Op Add) -> second + first :: rest
+          | (first::second::rest, Op Sub) -> second - first :: rest
+          | (first::second::rest, Op Mul) -> second * first :: rest
+          | (first::second::rest, Op Div) -> second / first :: rest
+      )
+      []
+      cmds
 
   let string cmds =
     "[" ^ str_x_list (fun cmd -> match cmd with
@@ -113,11 +122,19 @@ let rpn_eval_tests =
    RPN.eval, (=), (=),
    Some(RPN.string, str_int_list),
    [
-     (Some "Simple RPN", [RPN.Num 1; RPN.Num 2; RPN.Op Add], Ok [3]);
-     (Some "RPN Inval", [RPN.Num 1; RPN.Op Add], Error (Invalid_argument "rpn"));
-     (Some "RPN Commutativity", [RPN.Num 1; RPN.Num 2;  RPN.Op Sub], Ok [-1]);
-     (Some "More RPN", [RPN.Num 1; RPN.Num 2; RPN.Num 3;  RPN.Op Sub; RPN.Num 4;  RPN.Op Add], Ok [3; 1]);
+     (Some "RPN simple", [RPN.Num 1; RPN.Num 2; RPN.Op Add], Ok [3]);
+     (Some "RPN one arg", [RPN.Num 1; RPN.Op Add], Error (Invalid_argument "rpn"));
+     (Some "RPN Commutativity", [RPN.Num 1; RPN.Num 2; RPN.Op Sub], Ok [-1]);
+     (Some "RPN sub and add", [RPN.Num 1; RPN.Num 2; RPN.Num 3; RPN.Op Sub; RPN.Num 4;  RPN.Op Add], Ok [3; 1]);
      (* TODO *)
+     (Some "RPN div by zero", [RPN.Num 1; RPN.Num 0; RPN.Op Div], Error (Division_by_zero));
+     (Some "RPN no args", [RPN.Op Div], Error (Invalid_argument "rpn"));
+     (Some "RPN add extra args", [RPN.Num 1; RPN.Num 2; RPN.Num 3; RPN.Num 4; RPN.Op Add], Ok [7; 2; 1]);
+     (Some "RPN float result (round down)", [RPN.Num 5; RPN.Num 2; RPN.Op Div], Ok [2]);
+     (Some "RPN mul extra args", [RPN.Num 1; RPN.Num 2; RPN.Num 10; RPN.Op Mul], Ok [20; 1]);
+     (Some "RPN div extra args", [RPN.Num 1; RPN.Num 40; RPN.Num 10; RPN.Op Div], Ok [4; 1]);
+     (Some "RPN extra ops", [RPN.Num 1; RPN.Num 4; RPN.Op Add; RPN.Op Div], Error (Invalid_argument "rpn"));
+     (Some "RPN all ops", [RPN.Num 1; RPN.Num 2; RPN.Op Add; RPN.Num 2; RPN.Op Sub; RPN.Num 10; RPN.Op Mul; RPN.Num 5; RPN.Op Div; RPN.Num 1], Ok [1; 2]);
    ])
 
 
