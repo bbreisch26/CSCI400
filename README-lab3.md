@@ -28,6 +28,7 @@ Instructions
    - `Rope.rot_left`: O(1), ~3 lines
    - `Rope.rot_left_right`: O(1), ~6 lines
    - `Rope.bal`: O(h) = O(ln n), ~15 lines
+   - `Rope.cat`: O(h) = O(ln n), ~25 lines
    - `Rope.sub`: O(h) = O(ln n), ~15 lines
 
 5. Add at least 5 new *non-trivial* unit tests per function, at the
