@@ -8,5 +8,6 @@ lab0
 .project
 .vscode/
 .idea/
+*.swp
 
 

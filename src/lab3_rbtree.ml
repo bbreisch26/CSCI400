@@ -86,30 +86,76 @@ module RBTree = struct
   (* Balance constructor for a red-black tree *)
   let balance (c:color) (l : 'v tree) (v : 'v ) (r : 'v tree) : 'v tree =
     match (c,l,v,r) with
-    (* TODO, remove/modify the two cases below *)
-    | (Red,_,_,_) -> Rnode(l,v,r)
-    | (Black,_,_,_) -> Bnode(l,v,r)
+    (* Need to rebalance if red-red invariant -> balance from black grandparent*)
+    (* Case 1: Right rotation *)
+    | (Black, Rnode(Rnode(a, x, b), y, c), z, d)
+    | (Black, Rnode(a, x, Rnode(b, y, c)), z, d)
+    | (Black, a, x, Rnode(b, y, Rnode(c, z, d)))
+    | (Black, a, x, Rnode(Rnode(b, y, c), z, d)) ->
+       Rnode(Bnode(a, x, b), y, Bnode(c, z, d))
+  
+    (* Default - no rotation needed *)
+    | _ -> if c = Red then Rnode(l,v,r) else Bnode(l,v,r)
 
   (* Insert element x into a red-black tree
    *
    * Do not reinsert (duplicate) existing elements *)
   let insert (cmp : 'v cmp_fun) (t : 'v tree) (x:'v) : 'v tree =
     (* TODO, remove t *)
-    t
+    let rec insert_rec (n : 'v tree) =
+      match n with
+      | Empty -> Rnode(Empty, x, Empty)
+      | Bnode(l,v,r)
+      | Rnode(l,v,r) ->
+         (match cmp x v with
+          (* Do not insert duplicates *)
+          | Equal ->
+             n
+          (* Left subtree *)
+          | Lesser ->
+             balance (color n) (insert_rec l) v r
+          (* Right subtree *)
+          | Greater ->
+             balance (color n) l v (insert_rec r)
+         )
+    in
+    let balTree = insert_rec t in
+    match balTree with
+    (* Enforce black root node *)
+    | Rnode(l,v,r) -> Bnode(l,v,r)
+    | _ -> balTree
 
 
   (* Apply function f to every data element of tree t and collect the
    results in a list following an inorder traversal of the tree *)
   let map_inorder (f : 'v -> 'a) (t : 'v tree) : 'a list =
     (* TODO, remove [] *)
-    []
+    let rec map_inorder_helper (t : 'v tree) (acc : 'a list) =
+      match t with
+        | Empty -> acc
+        | Rnode(l,v,r)
+        | Bnode(l,v,r) ->
+           let right = map_inorder_helper r acc in
+           let acc_with_current = f v :: right in
+           map_inorder_helper l acc_with_current
+    in
+    map_inorder_helper t []
 
 
   (* Apply function f to every data element of tree t and collect the
    results in a list following the reverse of an inorder traversal of the tree *)
   let map_revorder (f : 'v -> 'a) (t : 'v tree) : 'a list =
     (* TODO, remove [] *)
-    []
+    let rec map_revorder_helper (t : 'v tree) (acc : 'a list) =
+      match t with
+      | Empty -> acc
+      | Rnode(l,v,r)
+      | Bnode(l,v,r) ->
+         let left = map_revorder_helper l acc in
+         let acc_with_current = f v :: left in
+         map_revorder_helper r acc_with_current
+    in
+    map_revorder_helper t []
 
 end
 
@@ -731,7 +777,7 @@ let rbt_map_inorder_tests =
   ])
 
 let rbt_map_revorder_tests =
-  ("rbt_map_inorder",
+  ("rbt_map_revorder",
    (fun (f,t) -> RBTree.map_revorder f t),
    (=), (=),
    map_printer,
