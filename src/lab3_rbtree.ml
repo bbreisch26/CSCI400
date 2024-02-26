@@ -17,6 +17,7 @@ module RBTree = struct
       Rnode(_,_,_) -> Red
     | Bnode(_,_,_) | Empty -> Black
 
+
   (* Result of comparing two values *)
   (* if a < b, then cmp a b -> Lesser *)
   (* if a = b, then cmp a b -> Equal *)
@@ -54,7 +55,21 @@ module RBTree = struct
 
   (* Test if red-black tree t is sorted. *)
   let rec is_sorted (cmp : 'v cmp_fun) (t : 'v tree) : bool =
-    false
+    match t with
+    | Empty -> true
+    | Rnode(x, v, y)
+    | Bnode(x, v, y) ->
+      match x with
+      | Empty -> true
+      | Rnode(_, l, _)
+      | Bnode(_, l, _) -> ((cmp l v) == Lesser)
+      &&
+      match y with
+      | Empty -> true
+      | Rnode(_, r, _)
+      | Bnode(_, r, _) -> ((cmp v r) == Lesser)
+      && (is_sorted cmp x) && (is_sorted cmp y)
+
 
   (* Search for element x in red-black tree t.
    *
@@ -401,6 +416,41 @@ let rbt_is_sorted_int_tests =
       RBTree.Bnode(r1, 2, r3),
       Ok(true));
      (* TODO *)
+     (Some("small tree fail 1"),
+     RBTree.Bnode(r1, 4, r3),
+     Ok(false));
+
+     (Some("small tree fail 2"),
+     RBTree.Bnode(r4, 1, r3),
+     Ok(false));
+
+     (Some("small tree fail 3"),
+     RBTree.Bnode(r3, 4, r1),
+     Ok(false));
+
+     (Some("bigger tree success 1"),
+     RBTree.Bnode(
+      RBTree.Rnode(b1, 2, b3),
+      4,
+      RBTree.Rnode(b5, 6, b7)
+     ),
+     Ok(true));
+
+     (Some("bigger tree success 2"),
+     RBTree.Rnode(
+      RBTree.Bnode(r1, 2, r3),
+      4,
+      RBTree.Bnode(r5, 6, Empty)
+     ),
+     Ok(true));
+
+     (Some("bigger tree fail"),
+     RBTree.Bnode(
+      RBTree.Rnode(b1, 2, b3),
+      10,
+      RBTree.Rnode(b5, 6, b7)
+     ),
+     Ok(false));
 
    ])
 
@@ -416,6 +466,41 @@ let rbt_is_sorted_str_tests =
       RBTree.Bnode(ra, "b", rc),
       Ok(true));
      (* TODO *)
+     (Some("small tree fail 1"),
+     RBTree.Bnode(ra, "d", rc),
+     Ok(false));
+
+     (Some("small tree fail 2"),
+     RBTree.Bnode(rd, "a", rc),
+     Ok(false));
+
+     (Some("small tree fail 3"),
+     RBTree.Bnode(rc, "d", ra),
+     Ok(false));
+
+     (Some("bigger tree success 1"),
+     RBTree.Bnode(
+      RBTree.Rnode(ba, "b", bc),
+      "d",
+      Empty
+     ),
+     Ok(true));
+
+     (Some("bigger tree success 2"),
+     RBTree.Rnode(
+      Empty,
+      "a",
+      RBTree.Bnode(rb, "c", Empty)
+     ),
+     Ok(true));
+
+     (Some("bigger tree fail"),
+     RBTree.Bnode(
+      RBTree.Rnode(ba, "b", bc),
+      "z",
+      RBTree.Rnode(bd, "s", Empty)
+     ),
+     Ok(false));
    ])
 
 let rbt_search_int_tests =
