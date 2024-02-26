@@ -33,12 +33,27 @@ module RBTree = struct
    *  2. Does every path from root to leaf have the same number of black nodes?
    *)
   let is_invariant (t : 'v tree) : bool =
-    (* TODO, remove false *)
-    false
+    (* p1, does every red node only have black children? *)
+    let rec p1 (tree : 'v tree) : bool =
+      match tree with
+      | Empty -> true
+      | Rnode(Rnode(_, _, _), _, _)
+      | Rnode(_, _, Rnode(_, _, _)) -> false
+      | Rnode(x, _, y)
+      | Bnode(x, _, y) -> (p1 x) && (p1 y)
+    (* p2, does every path from root to leaf have the same number of black nodes? *)
+    in let p2 (tree : 'v tree) : bool = 
+      let rec f (treee : 'v tree) : int = 
+        match treee with
+        | Empty -> 0
+        | Bnode(x, _, y) -> if ((f x) == (f y)) && (f x != -1) then 1 + (f x) else -1
+        | Rnode(x, _, y) -> if ((f x) == (f y)) && (f x != -1) then 0 + (f x) else -1
+      in (f tree) != -1
+    in (p1 t) && (p2 t)
+
 
   (* Test if red-black tree t is sorted. *)
   let rec is_sorted (cmp : 'v cmp_fun) (t : 'v tree) : bool =
-    (* TODO, remove false *)
     false
 
   (* Search for element x in red-black tree t.
@@ -206,10 +221,85 @@ let rbt_is_invariant_int_tests =
    Some(str_int_rbtree,
         str_bool),
    [
-     (Some("simple tree"),
+     (Some("simple tree 1 "),
       RBTree.Bnode(r1, 2, r3),
       Ok(true));
      (* TODO *)
+     (Some("property1 fail 1"),
+     RBTree.Rnode(r1, 2, b1),
+     Ok(false));
+
+     (Some("property1 fail 2"),
+     RBTree.Rnode(b1, 2, r1),
+     Ok(false));
+
+     (Some("property1 fail 3"),
+     RBTree.Rnode(r1, 2, r2),
+     Ok(false));
+
+     (Some("property1 success 1"),
+     RBTree.Rnode(b1, 2, b2),
+     Ok(true));
+
+     (Some("Empty tree"),
+     Empty,
+     Ok(true));
+
+     (Some("property2 fail 1"),
+     RBTree.Bnode(r1, 2, b1),
+     Ok(false));
+
+     (Some("property2 fail 2"),
+     RBTree.Bnode(b1, 2, r1),
+     Ok(false));
+
+     (Some("property2 success 1"),
+     RBTree.Bnode(b1, 2, b2),
+     Ok(true));
+
+     (Some("property2 fail 3"),
+     RBTree.Bnode(
+      RBTree.Bnode(b1, 2, b2),
+      2,
+      b3
+     ),
+     Ok(false));
+
+     (Some("property2 fail 4"),
+     RBTree.Bnode(
+      b1,
+      2,
+      RBTree.Bnode(b2, 2, b3)
+     ),
+     Ok(false));
+
+     (Some("bigger tree 1"),
+     RBTree.Bnode(
+      RBTree.Rnode(b2, 2, b3),
+      2,
+      b3
+     ),
+     Ok(true));
+
+     (Some("bigger tree 2"),
+     RBTree.Bnode(
+      b1,
+      2,
+      RBTree.Rnode(b2, 2, b3)
+     ),
+     Ok(true));
+
+     (Some("bigger tree fail"),
+     RBTree.Bnode(
+      RBTree.Rnode(
+        b2,
+        2,
+        RBTree.Bnode(r1, 2, b4)
+        ),
+      2,
+      b3
+     ),
+     Ok(false));
    ])
 
 let rbt_is_invariant_str_tests =
@@ -223,6 +313,81 @@ let rbt_is_invariant_str_tests =
       RBTree.Bnode(ra, "b", rc),
       Ok(true));
      (* TODO *)
+     (Some("property1 fail 1"),
+     RBTree.Rnode(ra, "a", ba),
+     Ok(false));
+
+     (Some("property1 fail 2"),
+     RBTree.Rnode(ba, "a", ra),
+     Ok(false));
+
+     (Some("property1 fail 3"),
+     RBTree.Rnode(ra, "a", rb),
+     Ok(false));
+
+     (Some("property1 success 1"),
+     RBTree.Rnode(ba, "a", bb),
+     Ok(true));
+
+     (Some("Empty tree"),
+     Empty,
+     Ok(true));
+
+     (Some("property2 fail 1"),
+     RBTree.Bnode(ra, "a", ba),
+     Ok(false));
+
+     (Some("property2 fail 2"),
+     RBTree.Bnode(ba, "a", ra),
+     Ok(false));
+
+     (Some("property2 success 1"),
+     RBTree.Bnode(ba, "a", bb),
+     Ok(true));
+
+     (Some("property2 fail 3"),
+     RBTree.Bnode(
+      RBTree.Bnode(ba, "a", bb),
+      "a",
+      bc
+     ),
+     Ok(false));
+
+     (Some("property2 fail 4"),
+     RBTree.Bnode(
+      ba,
+      "a",
+      RBTree.Bnode(bb, "a", bc)
+     ),
+     Ok(false));
+
+     (Some("bigger tree 1"),
+     RBTree.Bnode(
+      RBTree.Rnode(bb, "a", bc),
+      "a",
+      bc
+     ),
+     Ok(true));
+
+     (Some("bigger tree 2"),
+     RBTree.Bnode(
+      ba,
+      "a",
+      RBTree.Rnode(bb, "a", bc)
+     ),
+     Ok(true));
+
+     (Some("bigger tree fail"),
+     RBTree.Bnode(
+      RBTree.Rnode(
+        bb,
+        "a",
+        RBTree.Bnode(ra, "a", bd)
+        ),
+      "a",
+      bc
+     ),
+     Ok(false));
    ])
 
 let rbt_is_sorted_int_tests =
