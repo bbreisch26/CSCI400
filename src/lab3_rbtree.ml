@@ -75,8 +75,13 @@ module RBTree = struct
    *
    * Return true if the tree contains x and false if it does not. *)
   let rec search (cmp : 'v cmp_fun) (t : 'v tree) (x:'v) : bool =
-    (* TODO, remove false *)
-    false
+    match t with 
+    | Empty -> false
+    | Rnode(l, v, r)
+    | Bnode(l, v, r) -> 
+      if ((cmp v x) == Lesser) then (search cmp r x)
+      else if ((cmp v x) == Greater) then (search cmp l x)
+      else true
 
   (* Balance constructor for a red-black tree *)
   let balance (c:color) (l : 'v tree) (v : 'v ) (r : 'v tree) : 'v tree =
@@ -509,10 +514,61 @@ let rbt_search_int_tests =
    (=), (=),
    Some(int_tree_arg_printer, str_bool),
    [
-     (Some("simple tree"),
+     (Some("simple tree 1"),
       (RBTree.Bnode(r1, 2, r3), 2),
       Ok(true));
      (* TODO *)
+     (Some("simple tree 2"),
+      (RBTree.Bnode(r1, 2, r3), 3),
+      Ok(true));
+
+     (Some("simple tree fail 1"),
+      (RBTree.Bnode(r1, 2, r3), 5),
+      Ok(false));
+
+      (Some("simple tree fail 2"),
+      (RBTree.Bnode(r1, 2, r3), 0),
+      Ok(false));
+
+      (Some("bigger tree 1"),
+      (RBTree.Bnode(
+        RBTree.Rnode(b1, 2, b3),
+        4,
+        RBTree.Rnode(b5, 6, b7)
+      ),
+      7
+      ),
+      Ok(true));
+
+      (Some("bigger tree 2"),
+      (RBTree.Bnode(
+        RBTree.Rnode(b1, 2, b3),
+        4,
+        RBTree.Rnode(b5, 6, b7)
+      ),
+      3
+      ),
+      Ok(true));
+
+      (Some("bigger tree fail 1"),
+      (RBTree.Bnode(
+        RBTree.Rnode(b1, 2, b3),
+        4,
+        RBTree.Rnode(b5, 6, b7)
+      ),
+      0
+      ),
+      Ok(false));
+
+      (Some("bigger tree fail 2"),
+      (RBTree.Bnode(
+        RBTree.Rnode(b1, 2, b3),
+        4,
+        RBTree.Rnode(b5, 6, b10)
+      ),
+      7
+      ),
+      Ok(false));
    ])
 
 let rbt_search_str_tests =
@@ -525,6 +581,57 @@ let rbt_search_str_tests =
       (RBTree.Bnode(ra, "b", rc), "b"),
       Ok(true));
      (* TODO *)
+     (Some("simple tree 2"),
+      (RBTree.Bnode(ra, "b", rc), "c"),
+      Ok(true));
+
+    (Some("simple tree fail 1"),
+     (RBTree.Bnode(ra, "b", rc), "e"),
+     Ok(false));
+
+     (Some("simple tree fail 2"),
+     (RBTree.Bnode(ra, "b", rc), "1"),
+     Ok(false));
+
+     (Some("bigger tree 1"),
+     (RBTree.Bnode(
+       RBTree.Rnode(ba, "b", bc),
+       "d",
+       RBTree.Bnode(Empty, "g", Empty)
+     ),
+     "g"
+     ),
+     Ok(true));
+
+     (Some("bigger tree 2"),
+     (RBTree.Bnode(
+       RBTree.Rnode(ba, "b", bc),
+       "d",
+       RBTree.Bnode(Empty, "g", Empty)
+     ),
+     "c"
+     ),
+     Ok(true));
+
+     (Some("bigger tree fail 1"),
+     (RBTree.Bnode(
+       RBTree.Rnode(bb, "c", bd),
+       "e",
+       RBTree.Bnode(Empty, "g", Empty)
+     ),
+     "f"
+     ),
+     Ok(false));
+
+     (Some("bigger tree fail 2"),
+     (RBTree.Bnode(
+       RBTree.Rnode(bb, "c", bd),
+       "e",
+       RBTree.Bnode(Empty, "g", Empty)
+     ),
+     "a"
+     ),
+     Ok(false));
    ])
 
 let rbt_balance_tester t =
