@@ -53,7 +53,14 @@ module Rope = struct
     | Str(s) -> String.get s i
     | Cat(_,_,l,r) ->
        (* TODO: replace 'x' *)
-       'x'
+       match l with
+       | Empty -> out_of_bounds l
+       | Str(s) -> 
+          if String.length s-1 < i then get (r) (i-String.length s)
+          else String.get s i
+       | Cat(_,s,_,_) ->
+          if s-1 < i then get (r) (i-s)
+          else get (l) (i)
 
 
   (* Test if the balance invariant does not hold because l is "too big" *)
@@ -396,6 +403,22 @@ let get_tests =
    [
      (None, (Rope.Str "foo", 0), Ok 'f');
      (* TODO *)
+     (Some("Left Side"), (Rope.Cat(2, 6, Rope.Str "abc", Rope.Str "def"), 1), Ok 'b');
+     (Some("Right Side"), (Rope.Cat(2, 6, Rope.Str "abc", Rope.Str "def"), 4), Ok 'e');
+     (Some("Left then Left"), (Rope.Cat(3, 9, 
+                                        Rope.Cat(2, 6, Rope.Str "abc", Rope.Str "def"),
+                                        Rope.Str "ghi"),
+                               0), Ok 'a');
+     (Some("Left then Right"), (Rope.Cat(3, 9,
+                                         Rope.Cat(2, 6, Rope.Str "abc", Rope.Str "def"),
+                                         Rope.Str "ghi"),
+                                5), Ok 'f');
+     (Some("Right then Left"), (Rope.Cat(3, 9, Rope.Str "abc",
+                                         Rope.Cat(2, 6, Rope.Str "def", Rope.Str "ghi")),
+                                3), Ok 'd'); 
+     (Some("Right then Right"), (Rope.Cat(3, 9, Rope.Str "abc",
+                                          Rope.Cat(2, 6, Rope.Str "def", Rope.Str "ghi")),
+                                 6), Ok 'g');
    ]
   )
 
