@@ -85,6 +85,7 @@ module RBTree = struct
 
   (* Balance constructor for a red-black tree *)
   let balance (c:color) (l : 'v tree) (v : 'v ) (r : 'v tree) : 'v tree =
+    (* See slide 32 of L8-Persistence*)
     match (c,l,v,r) with
     (* Need to rebalance if red-red invariant -> balance from black grandparent*)
     (* Case 1: Right rotation *)
@@ -101,13 +102,13 @@ module RBTree = struct
    *
    * Do not reinsert (duplicate) existing elements *)
   let insert (cmp : 'v cmp_fun) (t : 'v tree) (x:'v) : 'v tree =
-    (* TODO, remove t *)
+    (* See slide 30 of L8 - Persistence *)
     let rec insert_rec (n : 'v tree) =
       match n with
       | Empty -> Rnode(Empty, x, Empty)
       | Bnode(l,v,r)
       | Rnode(l,v,r) ->
-         (match cmp x v with
+         match cmp x v with
           (* Do not insert duplicates *)
           | Equal ->
              n
@@ -117,7 +118,7 @@ module RBTree = struct
           (* Right subtree *)
           | Greater ->
              balance (color n) l v (insert_rec r)
-         )
+         
     in
     let balTree = insert_rec t in
     match balTree with
@@ -125,11 +126,9 @@ module RBTree = struct
     | Rnode(l,v,r) -> Bnode(l,v,r)
     | _ -> balTree
 
-
   (* Apply function f to every data element of tree t and collect the
    results in a list following an inorder traversal of the tree *)
   let map_inorder (f : 'v -> 'a) (t : 'v tree) : 'a list =
-    (* TODO, remove [] *)
     let rec map_inorder_helper (t : 'v tree) (acc : 'a list) =
       match t with
         | Empty -> acc
@@ -145,7 +144,6 @@ module RBTree = struct
   (* Apply function f to every data element of tree t and collect the
    results in a list following the reverse of an inorder traversal of the tree *)
   let map_revorder (f : 'v -> 'a) (t : 'v tree) : 'a list =
-    (* TODO, remove [] *)
     let rec map_revorder_helper (t : 'v tree) (acc : 'a list) =
       match t with
       | Empty -> acc
@@ -274,12 +272,15 @@ let ra =  RBTree.Rnode(RBTree.Empty,"a",RBTree.Empty)
 let rb =  RBTree.Rnode(RBTree.Empty,"b",RBTree.Empty)
 let rc =  RBTree.Rnode(RBTree.Empty,"c",RBTree.Empty)
 let rd =  RBTree.Rnode(RBTree.Empty,"d",RBTree.Empty)
+let re =  RBTree.Rnode(RBTree.Empty,"e",RBTree.Empty)
+let rf =  RBTree.Rnode(RBTree.Empty,"f",RBTree.Empty)
 
 let ba =  RBTree.Bnode(RBTree.Empty,"a",RBTree.Empty)
 let bb =  RBTree.Bnode(RBTree.Empty,"b",RBTree.Empty)
 let bc =  RBTree.Bnode(RBTree.Empty,"c",RBTree.Empty)
 let bd =  RBTree.Bnode(RBTree.Empty,"d",RBTree.Empty)
-
+let be =  RBTree.Bnode(RBTree.Empty,"e",RBTree.Empty)
+let bf =  RBTree.Bnode(RBTree.Empty,"f",RBTree.Empty)
 let rbt_is_invariant_int_tests =
   ("rbt_is_invariant_int",
    RBTree.is_invariant,
@@ -290,7 +291,7 @@ let rbt_is_invariant_int_tests =
      (Some("simple tree 1 "),
       RBTree.Bnode(r1, 2, r3),
       Ok(true));
-     (* TODO *)
+     
      (Some("property1 fail 1"),
      RBTree.Rnode(r1, 2, b1),
      Ok(false));
@@ -378,7 +379,7 @@ let rbt_is_invariant_str_tests =
      (Some("simple tree"),
       RBTree.Bnode(ra, "b", rc),
       Ok(true));
-     (* TODO *)
+     
      (Some("property1 fail 1"),
      RBTree.Rnode(ra, "a", ba),
      Ok(false));
@@ -466,7 +467,7 @@ let rbt_is_sorted_int_tests =
      (Some("simple tree"),
       RBTree.Bnode(r1, 2, r3),
       Ok(true));
-     (* TODO *)
+     
      (Some("small tree fail 1"),
      RBTree.Bnode(r1, 4, r3),
      Ok(false));
@@ -516,7 +517,7 @@ let rbt_is_sorted_str_tests =
      (Some("simple tree"),
       RBTree.Bnode(ra, "b", rc),
       Ok(true));
-     (* TODO *)
+     
      (Some("small tree fail 1"),
      RBTree.Bnode(ra, "d", rc),
      Ok(false));
@@ -626,7 +627,7 @@ let rbt_search_str_tests =
      (Some("simple tree"),
       (RBTree.Bnode(ra, "b", rc), "b"),
       Ok(true));
-     (* TODO *)
+     
      (Some("simple tree 2"),
       (RBTree.Bnode(ra, "b", rc), "c"),
       Ok(true));
@@ -700,9 +701,42 @@ let rbt_balance_int_tests =
             3,
             RBTree.Empty),
       Ok(RBTree.Rnode(b1,2,b3)));
-     (* TODO *)
+     
+     (* Cases B,C,D from L8-Persistence slide 33*)
+     (Some("Case B"),
+      RBTree.Bnode(RBTree.Rnode
+                     (RBTree.Empty,
+                      1,
+                      RBTree.Rnode(RBTree.Empty,2,RBTree.Empty)),
+                   3,
+                   RBTree.Empty),
+      Ok(RBTree.Rnode(b1,2,b3)));
 
+     (Some("Case C"),
+      RBTree.Bnode(RBTree.Empty,
+                   1,
+                   RBTree.Rnode(
+                       RBTree.Rnode(RBTree.Empty,2,RBTree.Empty),
+                       3,
+                       RBTree.Empty)),
+      Ok(RBTree.Rnode(b1,2,b3)));
 
+     (Some("Case D"),
+      RBTree.Bnode(RBTree.Empty,
+                   1,
+                   RBTree.Rnode(RBTree.Empty,2,
+                                RBTree.Rnode(RBTree.Empty,3,RBTree.Empty)
+                     )
+        ),
+      Ok(RBTree.Rnode(b1,2,b3)));
+     (Some("balanced - Red Root"),
+      RBTree.Rnode(b1,2,b3),
+      Ok(RBTree.Rnode(b1,2,b3)));
+
+     (Some("balanced - Black Root"),
+      RBTree.Bnode(b1,2,b3),
+      Ok(RBTree.Bnode(b1,2,b3)));
+                   
    ])
 
 let rbt_balance_str_tests =
@@ -715,8 +749,44 @@ let rbt_balance_str_tests =
       RBTree.Bnode(RBTree.Rnode(ra,"b",RBTree.Empty),
             "c",
             RBTree.Empty),
-      Ok(RBTree.Rnode(ba,"b",bc)))
+      Ok(RBTree.Rnode(ba,"b",bc)));
        (* TODO *)
+	 (* Cases B,C,D from L8-Persistence slide 33*)
+     (Some("Case B"),
+      RBTree.Bnode(RBTree.Rnode
+                     (RBTree.Empty,
+                      "a",
+                      RBTree.Rnode(RBTree.Empty,"b",RBTree.Empty)),
+                   "c",
+                   RBTree.Empty),
+      Ok(RBTree.Rnode(ba,"b",bc)));
+
+     (Some("Case C"),
+      RBTree.Bnode(RBTree.Empty,
+                   "a",
+                   RBTree.Rnode(
+                       RBTree.Rnode(RBTree.Empty,"b",RBTree.Empty),
+                       "c",
+                       RBTree.Empty)),
+      Ok(RBTree.Rnode(ba,"b",bc)));
+
+     (Some("Case D"),
+      RBTree.Bnode(RBTree.Empty,
+                   "a",
+                   RBTree.Rnode(RBTree.Empty,"b",
+                                RBTree.Rnode(RBTree.Empty,"c",RBTree.Empty)
+                     )
+        ),
+      Ok(RBTree.Rnode(ba,"b",bc)));
+
+     (Some("balanced - Red Root"),
+      RBTree.Rnode(ba,"b",bc),
+      Ok(RBTree.Rnode(ba,"b",bc)));
+     
+     (Some("balanced - Black Root"),
+      RBTree.Bnode(ra,"b",rc),
+      Ok(RBTree.Bnode(ra,"b",rc)));
+     
    ])
 
 let rbt_insert_tester f =
@@ -738,7 +808,28 @@ let rbt_insert_int_tests =
      (Some("simple tree"),
       (RBTree.Bnode(r1, 2, RBTree.Empty), 3),
       Ok(RBTree.Bnode(r1, 2, r3)));
-     (* TODO *)
+     (* DONE *)
+     (Some("empty tree"),
+      (RBTree.Empty, 1),
+      Ok(RBTree.Bnode(RBTree.Empty,1,RBTree.Empty)));
+     
+     (Some("left rotation"),
+      (RBTree.Bnode(RBTree.Empty, 1, r2), 3),
+      Ok(RBTree.Bnode(b1, 2, b3)));
+     
+     (Some("right rotation"),
+      (RBTree.Bnode(r1, 3, RBTree.Empty), 2),
+      Ok(RBTree.Bnode(b1, 2, b3)));
+
+     (Some("Recolor Root"),
+      (RBTree.Rnode(RBTree.Empty, 1, RBTree.Empty), 2),
+      Ok(RBTree.Bnode(RBTree.Empty, 1, r2)));
+
+     (Some("Bigger tree"),
+      (RBTree.Bnode(b1,2,RBTree.Rnode(b3,4,b5)), 6),
+       Ok(RBTree.Bnode(b1,2,RBTree.Rnode(b3,4,
+                                         RBTree.Bnode(RBTree.Empty,5,r6)))));
+      
    ])
 
 let str_rbt_insert_tester = rbt_insert_tester str_cmp
@@ -754,6 +845,21 @@ let rbt_insert_str_tests =
       (RBTree.Bnode(ra, "b", RBTree.Empty), "c"),
       Ok(RBTree.Bnode(ra, "b", rc)));
      (* TODO *)
+     (Some("empty tree"),
+      (RBTree.Empty, "a"),
+      Ok(RBTree.Bnode(RBTree.Empty,"a",RBTree.Empty)));
+     (Some("left rotation"),
+      (RBTree.Bnode(RBTree.Empty,"a",rb), "c"),
+      Ok(RBTree.Bnode(ba,"b",bc)));
+     (Some("right rotation"),
+      (RBTree.Bnode(ra, "c", RBTree.Empty), "b"),
+      Ok(RBTree.Bnode(ba, "b", bc)));
+     (Some("Recolor Root"),
+      (RBTree.Rnode(RBTree.Empty, "a", RBTree.Empty), "b"),
+      Ok(RBTree.Bnode(RBTree.Empty, "a", rb)));
+     (Some("Bigger tree"),
+      (RBTree.Bnode(ba, "b", RBTree.Rnode(bc,"d",be)), "f"),
+      Ok(RBTree.Bnode(ba,"b",RBTree.Rnode(bc,"d", RBTree.Bnode(RBTree.Empty, "e", rf)))));
    ])
 
 
@@ -763,7 +869,10 @@ let map_printer =
 
 
 let identity x = x
-
+let plusone x = x+1
+let minusone x = x-1
+let double x = 2*x
+let zero x = 0
 let rbt_map_inorder_tests =
   ("rbt_map_inorder",
    (fun (f,t) -> RBTree.map_inorder f t),
@@ -774,6 +883,22 @@ let rbt_map_inorder_tests =
       (identity,RBTree.Bnode(r1, 2, r3)),
       Ok([1; 2; 3]));
      (* TODO *)
+     (Some("plusone"),
+      (plusone,RBTree.Bnode(r1,2,r3)),
+      Ok([2;3;4]));
+     (Some("minusone"),
+      (minusone,RBTree.Bnode(RBTree.Empty, 70, RBTree.Empty)),
+      Ok([69]));
+     (Some("empty tree"),
+      (identity,RBTree.Empty),
+      Ok([]));
+     (Some("double - bigger tree"),
+      (double,RBTree.Bnode(r1,2,RBTree.Rnode(b3,4,b5))),
+      Ok([2;4;6;8;10]));
+     (Some("zero"),
+      (zero, RBTree.Bnode(r1,2,r3)),
+      Ok([0;0;0]));
+     
   ])
 
 let rbt_map_revorder_tests =
@@ -786,4 +911,20 @@ let rbt_map_revorder_tests =
       (identity,RBTree.Bnode(r1, 2, r3)),
       Ok([3; 2; 1]));
      (* TODO *)
+     (Some("plusone"),
+      (plusone,RBTree.Bnode(r1,2,r3)),
+      Ok([4;3;2]));
+     (Some("minusone"),
+      (minusone,RBTree.Bnode(RBTree.Empty, 70, RBTree.Empty)),
+      Ok([69]));
+     (Some("empty tree"),
+      (identity,RBTree.Empty),
+      Ok([]));
+     (Some("double - bigger tree"),
+      (double,RBTree.Bnode(r1,2,RBTree.Rnode(b3,4,b5))),
+      Ok([10;8;6;4;2]));
+     (Some("zero"),
+      (zero, RBTree.Bnode(r1,2,r3)),
+      Ok([0;0;0]));
+
   ])
