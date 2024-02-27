@@ -108,12 +108,12 @@ module Rope = struct
   (* Right rotation, then left rotation *)
   let rot_right_left (l : rope) (r : rope) : rope =
     (* DONE: replace Empty *)
-    match l,r with
-    | Cat(_,_,ll,lr),Str(_) -> 
-        match ll,lr with
-        | Str(_),Cat(_,_,lrl,lrr) -> create (create (ll) (lrl)) (create (lrr) (r))
-        | _ -> invalid_arg "Wrong rope types for right-left rotation"
-    | _ -> invalid_arg "Wrong rope types for right-left rotation"                
+    match (l,r) with
+    | (Cat(_,_,ll,lr),Str(_)) -> 
+        (match (ll,lr) with
+          | (Str(_),Cat(_,_,lrl,lrr)) -> create (create (ll) (lrl)) (create (lrr) (r))
+          | (_,_) -> invalid_arg "Wrong rope types for right-left rotation")
+    | (_,_) -> invalid_arg "Wrong rope types for right-left rotation"                
 
   (* Left rotation *)
   let rot_left (l : rope) (r : rope) : rope =
@@ -127,9 +127,9 @@ module Rope = struct
     (* DONE: replace Empty *)
     match l,r with
     | Str(_),Cat(_,_,rl,rr) ->
-          match rl,rr with
-          | Cat(_,_,rll,rlr),Str(_) -> create (create (l) (rll)) (create (rlr) (rr))
-          | _ -> invalid_arg "Wrong rope types for left-right rotation"
+          (match rl,rr with
+            | Cat(_,_,rll,rlr),Str(_) -> create (create (l) (rll)) (create (rlr) (rr))
+            | _ -> invalid_arg "Wrong rope types for left-right rotation")
     | _ -> invalid_arg "Wrong rope types for left-right rotation"
 
   (* Same as create but performs one step of rebalancing if
