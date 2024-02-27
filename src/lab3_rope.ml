@@ -148,13 +148,27 @@ module Rope = struct
        else if toobig (hr-1) hl then invalid_arg "Rope.bal: right too big"
        else
          (* TODO: Replace Empty *)
-         Empty
+         if hl - hr > 1 then
+          rot_right l r
+         else if hr - hl > 1 then
+          rot_left r l
+         else
+          create l r
+
 
   (* Same as create and bal, but no assumptions are made on the
      relative heights of l and r. *)
   let rec cat (l : rope) (r : rope) : rope =
     (* TODO: Replace Empty *)
-    Empty
+     match l with
+     | Empty -> r
+     | Str(s) -> bal (Str(s)) r
+     | Cat(_,_,ll,lr) ->
+      (match r with
+       | Empty -> l
+       | Str(s) -> bal l (Str(s))
+       | Cat(_,_,rl,rr) -> bal (cat ll rl) (cat lr rr))
+
 
   (* Extract the subrope beginning at position pos and containing len
      number of characters *)
@@ -168,7 +182,10 @@ module Rope = struct
        else from_string(String.sub s pos len)
     | Cat(_,_,l,r) ->
        (* TODO: Replace Empty *)
-       Empty
+       if pos <= length l then
+         sub l pos len
+       else
+         sub r (pos - length l) len
 
 end
 
@@ -385,12 +402,24 @@ let bal_helper = rope_pair_helper Rope.bal
 let bal_ok_list =
   create_ok_list (* handle everything Rope.create does *)
   @ [ (* and more *)
-      (* TODO *)
+    (None,
+     (Rope.Empty, Rope.Empty),
+     Ok (Rope.Empty));
+    (None,
+     (Rope.Empty, Rope.Str "x"),
+     Ok (Rope.Str "x"));
+    (None,
+     (Rope.Str "x", Rope.Empty),
+     Ok (Rope.Str "x"));
+    (None,
+     (Rope.Str "x", Rope.Str "y"),
+     Ok (Rope.Cat(2, 2, Rope.Str "x", Rope.Str "y")));
     ]
 let bal_all_list =
   bal_ok_list
   @ [
       (* TODO *)
+      
     ]
 let bal_tests =
   ("Rope.bal",
@@ -461,6 +490,14 @@ let sub_tests =
    [
      (None, (Rope.Str "foo", 1, 2),
       Ok (Rope.Str "oo"));
-     (* TODO *)
+      (*TODO Need two more and don't know how to check for index out of bounds*)
+     (None, (Rope.Str "foo", 0, 3), 
+      Ok (Rope.Str "foo"));
+     (None, (Rope.Str "foo", 1, 2), 
+      Ok (Rope.Str "oo"));
+     (None, (Rope.Str "foo", 2, 1), 
+      Ok (Rope.Str "o"));
+     (None, (Rope.Str "foo", 3, 0), 
+      Ok (Rope.Empty));
    ]
   )
