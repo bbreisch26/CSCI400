@@ -490,7 +490,7 @@ let sub_tests =
    [
      (None, (Rope.Str "foo", 1, 2),
       Ok (Rope.Str "oo"));
-      (*TODO Need two more and don't know how to check for index out of bounds*)
+     (* DONE *)
      (None, (Rope.Str "foo", 0, 3), 
       Ok (Rope.Str "foo"));
      (None, (Rope.Str "foo", 1, 2), 

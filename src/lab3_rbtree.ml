@@ -564,7 +564,7 @@ let rbt_search_int_tests =
      (Some("simple tree 1"),
       (RBTree.Bnode(r1, 2, r3), 2),
       Ok(true));
-     (* TODO *)
+     (* DONE *)
      (Some("simple tree 2"),
       (RBTree.Bnode(r1, 2, r3), 3),
       Ok(true));
@@ -701,7 +701,7 @@ let rbt_balance_int_tests =
             3,
             RBTree.Empty),
       Ok(RBTree.Rnode(b1,2,b3)));
-     
+     (* DONE *)
      (* Cases B,C,D from L8-Persistence slide 33*)
      (Some("Case B"),
       RBTree.Bnode(RBTree.Rnode
@@ -750,8 +750,8 @@ let rbt_balance_str_tests =
             "c",
             RBTree.Empty),
       Ok(RBTree.Rnode(ba,"b",bc)));
-       (* TODO *)
-	 (* Cases B,C,D from L8-Persistence slide 33*)
+     (* DONE *)
+     (* Cases B,C,D from L8-Persistence slide 33*)
      (Some("Case B"),
       RBTree.Bnode(RBTree.Rnode
                      (RBTree.Empty,
@@ -844,19 +844,23 @@ let rbt_insert_str_tests =
      (Some("simple tree"),
       (RBTree.Bnode(ra, "b", RBTree.Empty), "c"),
       Ok(RBTree.Bnode(ra, "b", rc)));
-     (* TODO *)
+     (* DONE *)
      (Some("empty tree"),
       (RBTree.Empty, "a"),
       Ok(RBTree.Bnode(RBTree.Empty,"a",RBTree.Empty)));
+     
      (Some("left rotation"),
       (RBTree.Bnode(RBTree.Empty,"a",rb), "c"),
       Ok(RBTree.Bnode(ba,"b",bc)));
+     
      (Some("right rotation"),
       (RBTree.Bnode(ra, "c", RBTree.Empty), "b"),
       Ok(RBTree.Bnode(ba, "b", bc)));
+     
      (Some("Recolor Root"),
       (RBTree.Rnode(RBTree.Empty, "a", RBTree.Empty), "b"),
       Ok(RBTree.Bnode(RBTree.Empty, "a", rb)));
+     
      (Some("Bigger tree"),
       (RBTree.Bnode(ba, "b", RBTree.Rnode(bc,"d",be)), "f"),
       Ok(RBTree.Bnode(ba,"b",RBTree.Rnode(bc,"d", RBTree.Bnode(RBTree.Empty, "e", rf)))));
@@ -882,19 +886,23 @@ let rbt_map_inorder_tests =
      (Some("simple tree"),
       (identity,RBTree.Bnode(r1, 2, r3)),
       Ok([1; 2; 3]));
-     (* TODO *)
+     (* DONE *)
      (Some("plusone"),
       (plusone,RBTree.Bnode(r1,2,r3)),
       Ok([2;3;4]));
+     
      (Some("minusone"),
       (minusone,RBTree.Bnode(RBTree.Empty, 70, RBTree.Empty)),
       Ok([69]));
+     
      (Some("empty tree"),
       (identity,RBTree.Empty),
       Ok([]));
+     
      (Some("double - bigger tree"),
       (double,RBTree.Bnode(r1,2,RBTree.Rnode(b3,4,b5))),
       Ok([2;4;6;8;10]));
+     
      (Some("zero"),
       (zero, RBTree.Bnode(r1,2,r3)),
       Ok([0;0;0]));
@@ -910,19 +918,23 @@ let rbt_map_revorder_tests =
      (Some("simple tree"),
       (identity,RBTree.Bnode(r1, 2, r3)),
       Ok([3; 2; 1]));
-     (* TODO *)
+     (* DONE *)
      (Some("plusone"),
       (plusone,RBTree.Bnode(r1,2,r3)),
       Ok([4;3;2]));
+     
      (Some("minusone"),
       (minusone,RBTree.Bnode(RBTree.Empty, 70, RBTree.Empty)),
       Ok([69]));
+     
      (Some("empty tree"),
       (identity,RBTree.Empty),
       Ok([]));
+     
      (Some("double - bigger tree"),
       (double,RBTree.Bnode(r1,2,RBTree.Rnode(b3,4,b5))),
       Ok([10;8;6;4;2]));
+     
      (Some("zero"),
       (zero, RBTree.Bnode(r1,2,r3)),
       Ok([0;0;0]));
