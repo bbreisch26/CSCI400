@@ -193,7 +193,11 @@ module Rope = struct
          let left_sub_rope_len = length l - pos in
          let left_sub_rope = sub l pos left_sub_rope_len in
          let right_sub_rope = sub r 0 (len - left_sub_rope_len) in
-         Cat (height left_sub_rope, len, left_sub_rope, right_sub_rope)
+         let new_height = max (height left_sub_rope) (height right_sub_rope) in
+         match (left_sub_rope, right_sub_rope) with
+         | (Cat(_,_,_,_), _)
+         | (_, Cat(_,_,_,_)) -> Cat (new_height + 1, len, left_sub_rope, right_sub_rope)
+         | _ -> Cat(new_height, len, left_sub_rope, right_sub_rope)
   
 end
 
@@ -524,5 +528,16 @@ let sub_tests =
       Error(Invalid_argument "index out of bounds"));
      (None, (Rope.Cat (2, 5, Rope.Cat(1, 4, Rope.Str "ab", Rope.Str "cd"), Rope.Str "e"), -1, 1),
       Error(Invalid_argument "index out of bounds"));
+     (None, (Rope.Cat (2, 5, Rope.Cat(1, 4, Rope.Str "ab", Rope.Str "cd"), Rope.Str "e"), 0, 4),
+      Ok(Rope.Cat (1,4, Rope.Str "ab", Rope.Str "cd")));
+     (None, (Rope.Cat (2, 5, Rope.Cat(1, 4, Rope.Str "ab", Rope.Str "cd"), Rope.Str "e"), 1, 4),
+      Ok(Rope.Cat (2, 4, Rope.Cat(1,3, Rope.Str "b", Rope.Str "cd"), Rope.Str "e")));
+     (None, (Rope.Cat (2, 5, Rope.Cat(1, 4, Rope.Str "ab", Rope.Str "cd"), Rope.Str "e"), 2, 3),
+      Ok(Rope.Cat (1, 3,  Rope.Str "cd", Rope.Str "e")));
+     (* Right sided rope*)
+     (None, (Rope.Cat (2, 5, Rope.Str("a"), Rope.Cat(1,4, Rope.Str("bc"),Rope.Str("de"))), 1, 4),
+      Ok(Rope.Cat(1,4, Rope.Str("bc"), Rope.Str("de"))));
+     (None, (Rope.Cat (2, 5, Rope.Str("a"), Rope.Cat(1, 4, Rope.Str("bc"),Rope.Str("de"))), 0, 4),
+      Ok(Rope.Cat(2,4, Rope.Str("a"), Rope.Cat(1, 3, Rope.Str("bc"), Rope.Str("d")))));
    ]
   )
