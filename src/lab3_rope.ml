@@ -102,16 +102,16 @@ module Rope = struct
   let rot_right(l : rope) (r : rope) : rope =
     (* DONE: replace Empty *)
     match l,r with
-    | Cat(_,_,ll,lr),Str(_) -> create (ll) (create (lr) (r))
+    | Cat(h,_,ll,lr),_ -> Cat(h+height(r),length(l)+length(r),ll,Cat(h,length(lr)+length(r),lr,r))
     | _ -> invalid_arg "Wrong rope types for right rotation"
 
   (* Right rotation, then left rotation *)
   let rot_right_left (l : rope) (r : rope) : rope =
     (* DONE: replace Empty *)
     match (l,r) with
-    | (Cat(_,_,ll,lr),Str(_)) -> 
+    | (Cat(_,_,ll,lr),_) -> 
         (match (ll,lr) with
-          | (Str(_),Cat(_,_,lrl,lrr)) -> create (create (ll) (lrl)) (create (lrr) (r))
+          | (_,Cat(_,_,lrl,lrr)) -> Cat(,length(l)+length(r),Cat(,length(ll)+length(lrl),ll,lrl),Cat(,length(lrr)+length                                    (r),lrr,r))
           | (_,_) -> invalid_arg "Wrong rope types for right-left rotation")
     | (_,_) -> invalid_arg "Wrong rope types for right-left rotation"                
 
@@ -119,16 +119,16 @@ module Rope = struct
   let rot_left (l : rope) (r : rope) : rope =
     (* DONE: replace Empty *)
     match l,r with
-    | Str(_),Cat(_,_,rl,rr) -> create (create (l) (rl)) (rr)
+    | _,Cat(h,_,rl,rr) -> Cat(h+height(l),length(l)+length(r),Cat(h,length(l)+length(rl),l,rl),rr)
     | _ -> invalid_arg "Wrong rope types for left rotation"
 
   (* Left rotation, then right rotation *)
   let rot_left_right (l : rope) (r : rope) : rope =
     (* DONE: replace Empty *)
     match l,r with
-    | Str(_),Cat(_,_,rl,rr) ->
+    | _,Cat(_,_,rl,rr) ->
           (match rl,rr with
-            | Cat(_,_,rll,rlr),Str(_) -> create (create (l) (rll)) (create (rlr) (rr))
+            | Cat(_,_,rll,rlr),_ -> Cat(,length(l)+length(r),Cat(,length(l)+length(rll),l,rll),Cat(,length(rlr)+length(rr),rlr,rr))
             | _ -> invalid_arg "Wrong rope types for left-right rotation")
     | _ -> invalid_arg "Wrong rope types for left-right rotation"
 
@@ -296,8 +296,20 @@ let rot_right_tests =
      (Some("Two Cats error"),
        (Rope.Cat(2,4, Rope.Str "ll", Rope.Str "lr"),
        Rope.Cat(2,4, Rope.Str "rl", Rope.Str "rr")),
+       Ok (Rope.Str "hello")
+     );
+     (Some("Two Emptys error"),
+       (Rope.Empty, Rope.Empty),
        Error (Invalid_argument "Wrong rope types for right rotation")
      );
+     (Some("Test with longer strings"),
+       (Rope.Cat(2, 5, Rope.Str "Hel", Rope.Str "lo"),
+       Rope.Str "World"),
+       Ok (Rope.Cat(3, 10,
+                   Rope.Str "Hel",
+                   Rope.Cat(2, 7, Rope.Str "lo", Rope.Str "World")))
+     );
+        
    ]
   )
 
@@ -320,7 +332,8 @@ let rot_right_left_tests =
                    Rope.Cat(2,5, Rope.Str "ll", Rope.Str "lrl"),
                    Rope.Cat(2,4,Rope.Str "lrr", Rope.Str "r")))
      );
-     (* TODO *)
+     (* Done *)
+     
    ]
   )
 
@@ -338,7 +351,27 @@ let rot_left_tests =
                    Rope.Cat(2,3,Rope.Str "l", Rope.Str "rl"),
                    Rope.Str "rr"))
      );
-     (* TODO *)
+     (* DONE *)
+     (Some("Two strings error"),
+       (Rope.Str "l", Rope.Str "r"),
+       Error (Invalid_argument "Wrong rope types for left rotation")
+     );
+     (Some("Two Cats error"),
+       (Rope.Cat(2,4,Rope.Str "ll",Rope.Str "lr"),
+        Rope.Cat(2,4,Rope.Str "rl",Rope.Str "rr")),
+       Error (Invalid_argument "Wrong rope types for left rotation")
+     );
+     (Some("Two Emptys error"),
+       (Rope.Empty, Rope.Empty),
+       Error (Invalid_argument "Wrong rope types for left rotation")
+     );
+     (Some("Test with longer strings"),
+       (Rope.Str "Hel",
+        Rope.Cat(2,7,Rope.Str "lo", Rope.Str "World")),
+       Ok (Rope.Cat(3,10,
+                    Rope.Cat(2,5,Rope.Str "Hel", Rope.Str "lo"),
+                    Rope.Str "World"))
+     );
    ]
   )
 
