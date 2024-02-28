@@ -173,11 +173,13 @@ module Rope = struct
   (* Extract the subrope beginning at position pos and containing len
      number of characters *)
   let rec sub (r : rope) (pos:int) (len:int) : rope =
+    if pos < 0 then out_of_bounds r
+    else
     match r with
     | Empty -> if pos = 0 && len = 0 then Empty
                else out_of_bounds r
     | Str(s) ->
-       if pos + len > String.length s || pos < 0
+       if pos + len > String.length s
        then out_of_bounds r
        else from_string(String.sub s pos len)
     | Cat(_,_,l,r) ->
@@ -187,11 +189,11 @@ module Rope = struct
        else if pos >= length l then
          sub r (pos - length l) len
        else
-         (*Recurse across tree *)
-         let left_rope_len = length l - pos in
-         let left_sub = sub l pos left_rope_len in
-         let right_sub = sub r 0 (len - left_rope_len) in
-         Cat (height left_sub, len, left_sub, right_sub)  
+         (*Recurse across tree, pos/len spans subropes*)
+         let left_sub_rope_len = length l - pos in
+         let left_sub_rope = sub l pos left_sub_rope_len in
+         let right_sub_rope = sub r 0 (len - left_sub_rope_len) in
+         Cat (height left_sub_rope, len, left_sub_rope, right_sub_rope)
   
 end
 
@@ -517,6 +519,10 @@ let sub_tests =
      (None, (Rope.Cat (1, 2, Rope.Str "a", Rope.Str "b"), 0, 2),
       Ok(Rope.Cat(1, 2, Rope.Str "a", Rope.Str "b")));
      (None, (Rope.Cat (2, 5, Rope.Cat(1,4, Rope.Str "ab", Rope.Str "cd"), Rope.Str "e"), 0, 2),
-     Ok(Rope.Str "ab"));
+      Ok(Rope.Str "ab"));
+     (None, (Rope.Cat (2, 5, Rope.Cat(1,4, Rope.Str "ab", Rope.Str "cd"), Rope.Str "e"), 10, 2),
+      Error(Invalid_argument "index out of bounds"));
+     (None, (Rope.Cat (2, 5, Rope.Cat(1, 4, Rope.Str "ab", Rope.Str "cd"), Rope.Str "e"), -1, 1),
+      Error(Invalid_argument "index out of bounds"));
    ]
   )
