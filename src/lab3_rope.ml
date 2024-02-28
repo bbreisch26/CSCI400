@@ -124,7 +124,9 @@ module Rope = struct
   let rot_left (l : rope) (r : rope) : rope =
     (* DONE: replace Empty *)
     match l,r with
-    | _,Cat(h,_,rl,rr) -> Cat(h+height(l),length(l)+length(r),Cat(h,length(l)+length(rl),l,rl),rr)
+    | _,Cat(_,_,rl,rr) ->
+       let rotated_l = Cat(1+max (height l) (height rl), (length l) + (length rl), l, rl) in
+       Cat(1+max (height rotated_l) (height rr), (length l) + (length r), rotated_l, rr)
     | _ -> invalid_arg "Wrong rope types for left rotation"
 
   (* Left rotation, then right rotation *)
@@ -371,11 +373,18 @@ let rot_left_tests =
        (Rope.Str "l", Rope.Str "r"),
        Error (Invalid_argument "Wrong rope types for left rotation")
      );
-     (Some("Two Cats error"),
-       (Rope.Cat(2,4,Rope.Str "ll",Rope.Str "lr"),
-        Rope.Cat(2,4,Rope.Str "rl",Rope.Str "rr")),
-       Error (Invalid_argument "Wrong rope types for left rotation")
+     (Some("Two Rope.Cats"),
+       (Rope.Cat(2,4,Rope.Str "he",Rope.Str "ll"),
+        Rope.Cat(2,6,Rope.Str "ow",Rope.Str "orld")),
+       Ok (Rope.Cat(4,10, Rope.Cat(3,6,Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),Rope.Str("ow")),Rope.Str("orld")))
      );
+     (Some("Rope.Cat rl child"),
+      (Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),
+       Rope.Cat(3,6,Rope.Cat(2,4,Rope.Str("ow"),Rope.Str("or")),Rope.Str("ld"))),
+      Ok(Rope.Cat(4,10, Rope.Cat(3,8,
+                                 Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),
+                                 Rope.Cat(2,4,Rope.Str("ow"),Rope.Str("or"))),
+                        Rope.Str("ld"))));
      (Some("Two Emptys error"),
        (Rope.Empty, Rope.Empty),
        Error (Invalid_argument "Wrong rope types for left rotation")
