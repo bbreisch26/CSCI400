@@ -2,7 +2,7 @@
 *.o
 *.cmi
 *.cmx
-lab0
+lab[0-9]
 
 #IDE Cruft
 .project

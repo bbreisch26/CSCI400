@@ -177,11 +177,11 @@ module Rope = struct
     | Empty -> if pos = 0 && len = 0 then Empty
                else out_of_bounds r
     | Str(s) ->
-       if pos + len > String.length s
+       if pos + len > String.length s || pos < 0
        then out_of_bounds r
        else from_string(String.sub s pos len)
     | Cat(_,_,l,r) ->
-       (* TODO: Replace Empty *)
+       (* DONE *)
        if pos <= length l then
          sub l pos len
        else
@@ -499,5 +499,9 @@ let sub_tests =
       Ok (Rope.Str "o"));
      (None, (Rope.Str "foo", 3, 0), 
       Ok (Rope.Empty));
+     (None, (Rope.Str "stringoutofbounds", 20, 1),
+      Error (Invalid_argument "index out of bounds"));
+     (None, (Rope.Str "stringoutofbounds", -10, 20),
+      Error (Invalid_argument "index out of bounds"));
    ]
   )
