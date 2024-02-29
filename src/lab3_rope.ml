@@ -387,6 +387,20 @@ let rot_right_left_tests =
                   Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),
                   Rope.Cat(3,6,Rope.Str("ow"),
                            Rope.Cat(2,4,Rope.Str("or"),Rope.Str("ld"))))));
+     (Some("Stupid tall tree"),
+      (Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("lll"),Rope.Str("llr")),
+                Rope.Cat(2,6,Rope.Str("lrl"),Rope.Str("lrr"))),
+       Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("rll"),Rope.Str("rlr")),
+                Rope.Cat(2,6,Rope.Str("rrl"),Rope.Str("rrr")))),
+      Ok(Rope.Cat(5,24,Rope.Cat(3,9,Rope.Cat(2,6,Rope.Str("lll"),Rope.Str("llr")),
+                                Rope.Str("lrl")),
+                  Rope.Cat(4,15,Rope.Str("lrr"),
+                           Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("rll"),Rope.Str("rlr")),
+                                    Rope.Cat(2,6,Rope.Str("rrl"),Rope.Str("rrr")))))));
+     (Some("Not deep enough for rotation"),
+      (Rope.Cat(2,2,Rope.Str("a"),Rope.Str("b")),
+       Rope.Cat(2,2,Rope.Str("c"),Rope.Str("d"))),
+      Error(Invalid_argument "Wrong rope types for right-left rotation"));
      
    ]
   )
@@ -465,6 +479,19 @@ let rot_left_right_tests =
       (Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),
        Rope.Cat(3,6,Rope.Cat(2,4,Rope.Str("ow"),Rope.Str("or")),Rope.Str("ld"))),
       Ok(Rope.Cat(4,10,Rope.Cat(3,6,Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),Rope.Str("ow")),Rope.Cat(2,4,Rope.Str("or"),Rope.Str("ld")))));
+     (Some("Stupid tall tree"),
+      (Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("lll"),Rope.Str("llr")),
+                Rope.Cat(2,6,Rope.Str("lrl"),Rope.Str("lrr"))),
+       Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("rll"),Rope.Str("rlr")),
+                Rope.Cat(2,6,Rope.Str("rrl"),Rope.Str("rrr")))),
+      Ok(Rope.Cat(5,24,Rope.Cat(4,15,Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("lll"),Rope.Str("llr")),
+                                              Rope.Cat(2,6,Rope.Str("lrl"),Rope.Str("lrr"))),
+                                Rope.Str("rll")),
+                  Rope.Cat(3,9,Rope.Str("rlr"),Rope.Cat(2,6,Rope.Str("rrl"),Rope.Str("rrr"))))));
+     (Some("Not deep enough"),
+      (Rope.Cat(2,2,Rope.Str("a"),Rope.Str("b")),
+       Rope.Cat(2,2,Rope.Str("c"),Rope.Str("d"))),
+      Error(Invalid_argument "Wrong rope types for left-right rotation"));
    ]
   )
 
