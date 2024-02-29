@@ -663,7 +663,7 @@ let cat_list =
        (Rope.Str "x", Rope.Cat(3, 4, 
                         Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d"))
                         ),
-       Ok (Rope.Cat(2, 5, Rope.Str "x", Rope.Str "abcd")));
+       Ok (Rope.Cat(4, 5, Rope.Cat(3,3,Rope.Cat(2,2,Rope.Str "x", Rope.Str "a"),Rope.Str "b"), Rope.Cat(2,2,Rope.Str "c", Rope.Str "d"))));
     ]
 
 
