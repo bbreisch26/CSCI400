@@ -184,7 +184,6 @@ module Rope = struct
   (* Same as create and bal, but no assumptions are made on the
      relative heights of l and r. *)
   let rec cat (l : rope) (r : rope) : rope =
-    (* TODO: Replace Empty *)
      match l, r with
      | Empty,Empty -> Empty
      | Empty,_ -> r
@@ -510,8 +509,9 @@ let create_ok_list = [
     (None,
      (Rope.Str "x", Rope.Str "y"),
      Ok (Rope.Cat(2, 2, Rope.Str "x", Rope.Str "y")));
-    (* TODO: tests also used for balance and cat *)
+    (* DONE: tests also used for balance and cat *)
   ]
+
 let create_all_list =
   create_ok_list
   @ [
@@ -527,6 +527,19 @@ let create_all_list =
                  Rope.Cat(2,2,Rope.Str "x", Rope.Str "y"),
                  Rope.Str "z")),
        Error (Invalid_argument "Rope.create: right too big"));
+      (None,
+       (Rope.Str "ax", Rope.Str "by"),
+        Ok (Rope.Cat(2, 4, Rope.Str "ax", Rope.Str "by")));
+      (None,
+       (Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), Rope.Str "c"),
+        Ok (Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), Rope.Str "c")));
+      (None,
+       (Rope.Str "a", Rope.Cat(2, 2, Rope.Str "b", Rope.Str "c")),
+        Ok (Rope.Cat(3, 3, Rope.Str "a", Rope.Cat(2, 2, Rope.Str "b", Rope.Str "c"))));
+      (None,
+       (Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2, Rope.Str "c", Rope.Str "d")),
+        Ok (Rope.Cat(3, 4, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), 
+                           Rope.Cat(2, 2, Rope.Str "c", Rope.Str "d"))));
     ]
 let create_tests =
   ("Rope.create",
@@ -535,7 +548,6 @@ let create_tests =
    rope_pair_printers,
    create_all_list
   )
-
 
 
 
@@ -584,7 +596,7 @@ let bal_all_list =
        Error (Invalid_argument "Rope.bal: left too big"));
       (None,
        (Rope.Str "x", Rope.Cat(4, 8, 
-                        Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
+                               Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
                         Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "e", Rope.Str "f"), Rope.Cat(2, 2,Rope.Str "g", Rope.Str "h")))
                         ),
        Error (Invalid_argument "Rope.bal: right too big"));
@@ -592,7 +604,7 @@ let bal_all_list =
        (Rope.Str "x", Rope.Cat(3, 4, 
                         Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d"))
                         ),
-       Ok (Rope.Cat(3, 5, Rope.Str "x", Rope.Str "abcd")));
+       Ok (Rope.Cat(4,5, Rope.Cat(3,3,Rope.Str("x"),Rope.Cat(2,2,Rope.Str("a"),Rope.Str("b"))), Rope.Cat(2,2,Rope.Str("c"),Rope.Str("d")))));
 
     ]
 let bal_tests =
