@@ -629,9 +629,12 @@ let cat_list =
                         Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
                           , Rope.Str "c")
                             , Rope.Str "d"), Rope.Str "x"),
-       Ok (Rope.Cat(4, 5,
+       Ok (Rope.Cat(5, 5,
                     Rope.Cat(2,2,Rope.Str "x",Rope.Str "d")
-                    , Rope.Cat(3,3,Rope.Cat(2,2,Rope.Str "a",Rope.Str "b"),Rope.Str "c"))));
+                    , Rope.Cat(3,3,
+                               Rope.Cat(2,2,Rope.Str "a",Rope.Str "b"),
+                               Rope.Str "c")))
+       );
       (None,
        (Rope.Cat(4, 8, 
                         Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
