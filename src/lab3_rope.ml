@@ -185,15 +185,15 @@ module Rope = struct
      relative heights of l and r. *)
   let rec cat (l : rope) (r : rope) : rope =
     (* TODO: Replace Empty *)
-     match l, r with
-     | Empty,Empty -> Empty
-     | Empty,_ -> r
-     | _, Empty -> l
-     | Str(s),Str(x) -> create l r 
-     | Str(s),Cat(h,len,rl,rr) -> Cat (h + 1, len + String.length s, (cat l rl), rr)
-     | Cat(h,len,ll,lr),Str(s) -> Cat (h + 1, len + String.length s, (cat r lr), ll)
-     | Cat(_,_,ll,lr),Cat(rl,rr,_,_) ->
-      let hl,hr = height l,height r in
+     match (l, r) with
+     | (Empty,Empty) -> Empty
+     | (Empty,_) -> r
+     | (_, Empty) -> l
+     | (Str(s),Str(x)) -> create l r 
+     | (Str(s),Cat(h,len,rl,rr)) -> Cat (h + 1, len + String.length s, (cat l rl), rr)
+     | (Cat(h,len,ll,lr),Str(s)) -> Cat (h + 1, len + String.length s, (cat r lr), ll)
+     | (Cat(_,_,ll,lr),Cat(_,_,rl,rr)) ->
+        let hl,hr = height l, height r in
         if toobig hl hr then
           rot_right l r
         else if toobig hr hl then
@@ -584,7 +584,7 @@ let bal_all_list =
        Error (Invalid_argument "Rope.bal: left too big"));
       (None,
        (Rope.Str "x", Rope.Cat(4, 8, 
-                        Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
+                               Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
                         Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "e", Rope.Str "f"), Rope.Cat(2, 2,Rope.Str "g", Rope.Str "h")))
                         ),
        Error (Invalid_argument "Rope.bal: right too big"));
@@ -592,7 +592,7 @@ let bal_all_list =
        (Rope.Str "x", Rope.Cat(3, 4, 
                         Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d"))
                         ),
-       Ok (Rope.Cat(3, 5, Rope.Str "x", Rope.Str "abcd")));
+       Ok (Rope.Cat(4,5, Rope.Cat(3,3,Rope.Str("x"),Rope.Cat(2,2,Rope.Str("a"),Rope.Str("b"))), Rope.Cat(2,2,Rope.Str("c"),Rope.Str("d")))));
 
     ]
 let bal_tests =
