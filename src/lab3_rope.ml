@@ -624,6 +624,19 @@ let cat_list =
       (None,
        (Rope.Str "xa", Rope.Str "yb"),
        Ok (Rope.Cat(2, 4, Rope.Str "xa", Rope.Str "yb")));
+
+      (None,
+       (Rope.Cat(4, 4, 
+                        Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
+                          , Rope.Str "c")
+                            , Rope.Str "d"), Rope.Str "x"),
+       Ok (Rope.Cat(5, 5,
+                    Rope.Cat(2,2,Rope.Str "x",Rope.Str "d")
+                    , Rope.Cat(3,3,
+                               Rope.Cat(2,2,Rope.Str "a",Rope.Str "b"),
+                               Rope.Str "c")))
+       );
+
       (None,
        (Rope.Str "x", Rope.Cat(4, 4, 
                         Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
@@ -636,29 +649,19 @@ let cat_list =
                                       Rope.Str "b"),
                              Rope.Str "c"),
                     Rope.Str "d")));
+                    
       (None,
-       (Rope.Cat(4, 4, 
+       (Rope.Str "x", Rope.Cat(4, 5, 
                         Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
                           , Rope.Str "c")
-                            , Rope.Str "d"), Rope.Str "x"),
-       Ok (Rope.Cat(5, 5,
-                    Rope.Cat(2,2,Rope.Str "x",Rope.Str "d")
-                    , Rope.Cat(3,3,
-                               Rope.Cat(2,2,Rope.Str "a",Rope.Str "b"),
-                               Rope.Str "c")))
-       );
-      (None,
-       (Rope.Cat(4, 8, 
-                        Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
-                        Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "e", Rope.Str "f"), Rope.Cat(2, 2,Rope.Str "g", Rope.Str "h")))
-                        , Rope.Str "x"),
-       Ok (Rope.Cat(2, 9, Rope.Str "x", Rope.Str "efghabcd")));
-      (None,
-       (Rope.Str "x", Rope.Cat(4, 8, 
-                        Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
-                        Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "e", Rope.Str "f"), Rope.Cat(2, 2,Rope.Str "g", Rope.Str "h")))
-                        ),
-       Ok (Rope.Cat(2, 9, Rope.Str "x", Rope.Str "abcdefgh")));
+                            , Rope.Cat(2, 2, Rope.Str "d", Rope.Str "e"))),
+       Ok (Rope.Cat(5, 6,
+                    Rope.Cat(4,4,
+                             Rope.Cat(3,3, 
+                                      Rope.Cat(2,2, Rope.Str "x", Rope.Str "a"),
+                                      Rope.Str "b"),
+                             Rope.Str "c"),
+                    Rope.Cat(2, 2, Rope.Str "d", Rope.Str "e"))));
       (None,
        (Rope.Str "x", Rope.Cat(3, 4, 
                         Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d"))
