@@ -617,30 +617,38 @@ let cat_list =
                         Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
                           , Rope.Str "c")
                             , Rope.Str "d")),
-       Ok (Rope.Cat(3, 5, Rope.Str "x", Rope.Str "abcd")));
+       Ok (Rope.Cat(5, 5,
+                    Rope.Cat(4,4,
+                             Rope.Cat(3,3, 
+                                      Rope.Cat(2,2, Rope.Str "x", Rope.Str "a"),
+                                      Rope.Str "b"),
+                             Rope.Str "c"),
+                    Rope.Str "d")));
       (None,
        (Rope.Cat(4, 4, 
                         Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
                           , Rope.Str "c")
                             , Rope.Str "d"), Rope.Str "x"),
-       Ok (Rope.Cat(3, 5, Rope.Str "x", Rope.Str "dabc")));
+       Ok (Rope.Cat(4, 5,
+                    Rope.Cat(2,2,Rope.Str "x",Rope.Str "d")
+                    , Rope.Cat(3,3,Rope.Cat(2,2,Rope.Str "a",Rope.Str "b"),Rope.Str "c"))));
       (None,
        (Rope.Cat(4, 8, 
                         Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
                         Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "e", Rope.Str "f"), Rope.Cat(2, 2,Rope.Str "g", Rope.Str "h")))
                         , Rope.Str "x"),
-       Ok (Rope.Cat(3, 9, Rope.Str "x", Rope.Str "efghabcd")));
+       Ok (Rope.Cat(2, 9, Rope.Str "x", Rope.Str "efghabcd")));
       (None,
        (Rope.Str "x", Rope.Cat(4, 8, 
                         Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
                         Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "e", Rope.Str "f"), Rope.Cat(2, 2,Rope.Str "g", Rope.Str "h")))
                         ),
-       Ok (Rope.Cat(3, 9, Rope.Str "x", Rope.Str "abcdefgh")));
+       Ok (Rope.Cat(2, 9, Rope.Str "x", Rope.Str "abcdefgh")));
       (None,
        (Rope.Str "x", Rope.Cat(3, 4, 
                         Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d"))
                         ),
-       Ok (Rope.Cat(3, 5, Rope.Str "x", Rope.Str "abcd")));
+       Ok (Rope.Cat(2, 5, Rope.Str "x", Rope.Str "abcd")));
     ]
 
 
