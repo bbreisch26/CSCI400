@@ -377,6 +377,16 @@ let rot_right_left_tests =
      (Some("two empty ropes - error"),
       (Rope.Empty, Rope.Empty),
       Error(Invalid_argument "Wrong rope types for right-left rotation"));
+     (Some("One string rope - error"),
+      (Rope.Cat(2,4,Rope.Str("ab"),Rope.Str("cd")), Rope.Str("ef")),
+      Error(Invalid_argument "Wrong rope types for right-left rotation"));
+     (Some("Longer left child"),
+      (Rope.Cat(3,6,Rope.Str("he"),Rope.Cat(2,4,Rope.Str("ll"),Rope.Str("ow"))),
+       Rope.Cat(2,4,Rope.Str("or"),Rope.Str("ld"))),
+      Ok(Rope.Cat(4,10,
+                  Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),
+                  Rope.Cat(3,6,Rope.Str("ow"),
+                           Rope.Cat(2,4,Rope.Str("or"),Rope.Str("ld"))))));
      
    ]
   )
@@ -448,6 +458,13 @@ let rot_left_right_tests =
      (Some("two empty ropes - error"),
       (Rope.Empty, Rope.Empty),
       Error(Invalid_argument "Wrong rope types for left-right rotation"));
+     (Some("One string rope - error"),
+      (Rope.Cat(2,4,Rope.Str("ab"),Rope.Str("cd")), Rope.Str("ef")),
+      Error(Invalid_argument "Wrong rope types for left-right rotation"));
+     (Some("longer right child"),
+      (Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),
+       Rope.Cat(3,6,Rope.Cat(2,4,Rope.Str("ow"),Rope.Str("or")),Rope.Str("ld"))),
+      Ok(Rope.Cat(4,10,Rope.Cat(3,6,Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),Rope.Str("ow")),Rope.Cat(2,4,Rope.Str("or"),Rope.Str("ld")))));
    ]
   )
 
