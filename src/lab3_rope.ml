@@ -184,16 +184,15 @@ module Rope = struct
   (* Same as create and bal, but no assumptions are made on the
      relative heights of l and r. *)
   let rec cat (l : rope) (r : rope) : rope =
-    (* TODO: Replace Empty *)
-     match (l, r) with
-     | (Empty,Empty) -> Empty
-     | (Empty,_) -> r
-     | (_, Empty) -> l
-     | (Str(s),Str(x)) -> create l r 
-     | (Str(s),Cat(h,len,rl,rr)) -> Cat (h + 1, len + String.length s, (cat l rl), rr)
-     | (Cat(h,len,ll,lr),Str(s)) -> Cat (h + 1, len + String.length s, (cat r lr), ll)
-     | (Cat(_,_,ll,lr),Cat(_,_,rl,rr)) ->
-        let hl,hr = height l, height r in
+     match l, r with
+     | Empty,Empty -> Empty
+     | Empty,_ -> r
+     | _, Empty -> l
+     | Str(s),Str(x) -> create l r 
+     | Str(s),Cat(h,len,rl,rr) -> Cat (h + 1, len + String.length s, (cat l rl), rr)
+     | Cat(h,len,ll,lr),Str(s) -> Cat (h + 1, len + String.length s, (cat r lr), ll)
+     | Cat(_,_,ll,lr),Cat(rl,rr,_,_) ->
+      let hl,hr = height l,height r in
         if toobig hl hr then
           rot_right l r
         else if toobig hr hl then
@@ -510,8 +509,9 @@ let create_ok_list = [
     (None,
      (Rope.Str "x", Rope.Str "y"),
      Ok (Rope.Cat(2, 2, Rope.Str "x", Rope.Str "y")));
-    (* TODO: tests also used for balance and cat *)
+    (* DONE: tests also used for balance and cat *)
   ]
+
 let create_all_list =
   create_ok_list
   @ [
@@ -527,6 +527,19 @@ let create_all_list =
                  Rope.Cat(2,2,Rope.Str "x", Rope.Str "y"),
                  Rope.Str "z")),
        Error (Invalid_argument "Rope.create: right too big"));
+      (None,
+       (Rope.Str "ax", Rope.Str "by"),
+        Ok (Rope.Cat(2, 4, Rope.Str "ax", Rope.Str "by")));
+      (None,
+       (Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), Rope.Str "c"),
+        Ok (Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), Rope.Str "c")));
+      (None,
+       (Rope.Str "a", Rope.Cat(2, 2, Rope.Str "b", Rope.Str "c")),
+        Ok (Rope.Cat(3, 3, Rope.Str "a", Rope.Cat(2, 2, Rope.Str "b", Rope.Str "c"))));
+      (None,
+       (Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2, Rope.Str "c", Rope.Str "d")),
+        Ok (Rope.Cat(3, 4, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), 
+                           Rope.Cat(2, 2, Rope.Str "c", Rope.Str "d"))));
     ]
 let create_tests =
   ("Rope.create",
@@ -535,7 +548,6 @@ let create_tests =
    rope_pair_printers,
    create_all_list
   )
-
 
 
 
