@@ -114,9 +114,9 @@ module Rope = struct
     | (Cat(_,_,ll,lr),_) -> 
        (match (ll,lr) with
         | (_,Cat(_,_,lrl,lrr)) ->
-           let rotated_lr = Cat(1+max (height lrl) (height lrr), length lrl + length lrr, lrl, lrr) in
-           let rotated_l = Cat(1+max (height ll) (height lr), length ll + length rotated_lr, ll, rotated_lr) in
-           Cat(1+max (height rotated_l) (height r), length rotated_l + length r, rotated_l, r) 
+           let rotated_ll = Cat(1+max (height ll) (height lrl), (length ll) + (length lrl), ll, lrl) in
+           let rotated_l = Cat(1+max (height rotated_ll) (height lrr), (length rotated_ll) + (length lrr), rotated_ll, lrr) in
+           (rot_right rotated_l r) 
           | (_,_) -> invalid_arg "Wrong rope types for right-left rotation")
     | (_,_) -> invalid_arg "Wrong rope types for right-left rotation"                
 
@@ -135,8 +135,11 @@ module Rope = struct
     match l,r with
     | _,Cat(_,_,rl,rr) ->
        (match rl,rr with
-            | Cat(_,_,rll,rlr),_ -> Cat(0,length(l)+length(r),Cat(0,length(l)+length(rll),l,rll),Cat(0,length(rlr)+length(rr),rlr,rr))
-            | _ -> invalid_arg "Wrong rope types for left-right rotation")
+        | Cat(_,_,rll,rlr),_ ->
+           let rotated_rr = Cat(1+max (height rr) (height rlr), (length rr) + length(rlr), rr, rlr) in
+           let rotated_r = Cat(1+max (height rotated_rr) (height rll), (length rotated_rr) + (length rll), rotated_rr, rll) in
+           (rot_left l (rot_right rl rr))
+        | _ -> invalid_arg "Wrong rope types for left-right rotation")
     | _ -> invalid_arg "Wrong rope types for left-right rotation"
 
   (* Same as create but performs one step of rebalancing if
