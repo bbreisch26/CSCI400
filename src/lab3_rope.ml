@@ -136,9 +136,9 @@ module Rope = struct
     | _,Cat(_,_,rl,rr) ->
        (match rl,rr with
         | Cat(_,_,rll,rlr),_ ->
-           let rotated_rr = Cat(1+max (height rr) (height rlr), (length rr) + length(rlr), rr, rlr) in
-           let rotated_r = Cat(1+max (height rotated_rr) (height rll), (length rotated_rr) + (length rll), rotated_rr, rll) in
-           (rot_left l (rot_right rl rr))
+           let rotated_rr = Cat(1+max (height rr) (height rlr), (length rr) + length(rlr), rlr, rr) in
+           let rotated_r = Cat(1+max (height rotated_rr) (height rll), (length rotated_rr) + (length rll), rll, rotated_rr) in
+           (rot_left l rotated_r)
         | _ -> invalid_arg "Wrong rope types for left-right rotation")
     | _ -> invalid_arg "Wrong rope types for left-right rotation"
 
@@ -353,6 +353,9 @@ let rot_right_left_tests =
                    Rope.Cat(2,4,Rope.Str "lrr", Rope.Str "r")))
      );
      (* Done *)
+     (Some("two empty ropes - error"),
+      (Rope.Empty, Rope.Empty),
+      Error(Invalid_argument "Wrong rope types for right-left rotation"));
      
    ]
   )
@@ -421,6 +424,9 @@ let rot_left_right_tests =
                    Rope.Cat(2,5,Rope.Str "rlr", Rope.Str "rr")))
      );
      (* TODO *)
+     (Some("two empty ropes - error"),
+      (Rope.Empty, Rope.Empty),
+      Error(Invalid_argument "Wrong rope types for left-right rotation"));
    ]
   )
 
