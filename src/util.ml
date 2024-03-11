@@ -16,6 +16,28 @@ let str_str (x:string) : string = x
 let rec str_pair (f : 'a -> string) (g : 'b -> string) ((a,b) : ('a * 'b)) : string =
   "(" ^ (f a) ^ "," ^ (g b) ^ ")"
 
+
+let str_tuple3 (f0 : 'x0 -> string) (f1 : 'x1 -> string) (f2 : 'x2 -> string)
+      ((x0,x1,x2) : ('x0*'x1*'x2))
+    : string =
+  "("
+  ^ (f0 x0) ^ ","
+  ^ (f1 x1) ^ ","
+  ^ (f2 x2)
+  ^ ")"
+
+let str_tuple4
+      (f0 : 'x0 -> string) (f1 : 'x1 -> string)
+      (f2 : 'x2 -> string) (f3 : 'x3 -> string)
+      ((x0,x1,x2,x3) : ('x0*'x1*'x2*'x3))
+    : string =
+  "("
+  ^ (f0 x0) ^ ","
+  ^ (f1 x1) ^ ","
+  ^ (f2 x2) ^ ","
+  ^ (f3 x3)
+  ^ ")"
+
 let rec str_option (f : 'a -> string) (o : 'a option) : string =
    match o with
    | None -> ""

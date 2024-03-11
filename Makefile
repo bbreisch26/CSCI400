@@ -74,7 +74,24 @@ LABS += lab3
 endif
 
 
-$(eval $(call LAB_TEMPLATE,4))
+# Lab 4
+LAB4_O = build/util.$(CMO) build/testing.$(CMO) build/lab4_lazy.$(CMO) build/lab4_stream.$(CMO) build/lab4_queue.$(CMO)
+build/lab4_main.$(CMO): $(LAB4_O)
+build/lab4_lazy.$(CMO): build/testing.$(CMO) build/util.$(CMO)
+build/lab4_stream.$(CMO): build/testing.$(CMO) build/util.$(CMO) build/lab4_lazy.$(CMO)
+build/lab4_queue.$(CMO): build/testing.$(CMO) build/util.$(CMO) build/lab4_stream.$(CMO)
+
+lab4: build/lab4_main.$(CMO)
+	$(OCAMLC) $(OCAML_FLAGS) -o lab4 $(LAB4_O) build/lab4_main.$(CMO)
+
+lab4_test: lab4
+	./lab4
+
+ifneq (,$(wildcard ./src/lab4_main.ml))
+LABS += lab4
+endif
+
+
 
 ###########
 ## Lab 5 ##
