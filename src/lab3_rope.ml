@@ -136,9 +136,9 @@ module Rope = struct
     | _,Cat(_,_,rl,rr) ->
        (match rl,rr with
         | Cat(_,_,rll,rlr),_ ->
-           let rotated_rr = Cat(1+max (height rr) (height rlr), (length rr) + length(rlr), rr, rlr) in
-           let rotated_r = Cat(1+max (height rotated_rr) (height rll), (length rotated_rr) + (length rll), rotated_rr, rll) in
-           (rot_left l (rot_right rl rr))
+           let rotated_rr = Cat(1+max (height rr) (height rlr), (length rr) + length(rlr), rlr, rr) in
+           let rotated_r = Cat(1+max (height rotated_rr) (height rll), (length rotated_rr) + (length rll), rll, rotated_rr) in
+           (rot_left l rotated_r)
         | _ -> invalid_arg "Wrong rope types for left-right rotation")
     | _ -> invalid_arg "Wrong rope types for left-right rotation"
 
@@ -150,34 +150,54 @@ module Rope = struct
     match l,r with
     | Empty,_  -> r
     | _,Empty  -> l
-    | _ ->
+    | Str(s), Str(sr) -> (*Went back and added this as early check for if both ropes are just str*)
+      create l r
+    | _ -> 
        let hl,hr = height l,height r in
        if not (is_balanced l) then invalid_arg "Rope.bal: left unbalanced"
        else if not (is_balanced r) then invalid_arg "Rope.bal: right unbalanced"
        else if toobig (hl-1) hr then invalid_arg "Rope.bal: left too big"
        else if toobig (hr-1) hl then invalid_arg "Rope.bal: right too big"
        else
-         (* TODO: Replace Empty *)
-         if hl - hr > 1 then
-          rot_right l r
-         else if hr - hl > 1 then
-          rot_left r l
-         else
-          create l r
+        (*Continue match here, it's not pretty but TA advised me to do it like this*)
+         match l,r with
+         | Cat(hl, llen, ll, lr), Cat(hr, rlen, rl, rr) ->
+          if toobig hl hr then
+            rot_right l r
+          else if toobig hr hl then
+            rot_left l r
+          else
+            create l r
+         | Cat(hl, llen, ll, lr), Str(s) ->
+          if toobig hl hr then
+            rot_right l r
+          else
+            create l r
+         | Str(s), Cat(hr, rlen, rl, rr) ->
+          if toobig hr hl then
+            rot_left l r
+          else
+            create l r
+          
 
 
   (* Same as create and bal, but no assumptions are made on the
      relative heights of l and r. *)
   let rec cat (l : rope) (r : rope) : rope =
-    (* TODO: Replace Empty *)
-     match l with
-     | Empty -> r
-     | Str(s) -> bal (Str(s)) r
-     | Cat(_,_,ll,lr) ->
-      (match r with
-       | Empty -> l
-       | Str(s) -> bal l (Str(s))
-       | Cat(_,_,rl,rr) -> bal (cat ll rl) (cat lr rr))
+     match l, r with
+     | Empty,Empty -> Empty
+     | Empty,_ -> r
+     | _, Empty -> l
+     | Str(s),Str(x) -> create l r 
+     | Str(s),Cat(h,len,rl,rr) -> Cat (h + 1, len + String.length s, (cat l rl), rr)
+     | Cat(h,len,ll,lr),Str(s) -> Cat (h + 1, len + String.length s, (cat r lr), ll)
+     | Cat(_,_,ll,lr),Cat(rl,rr,_,_) ->
+      let hl,hr = height l,height r in
+        if toobig hl hr then
+          rot_right l r
+        else if toobig hr hl then
+          rot_left l r
+        else create l r
 
 
   (* Extract the subrope beginning at position pos and containing len
@@ -353,6 +373,33 @@ let rot_right_left_tests =
                    Rope.Cat(2,4,Rope.Str "lrr", Rope.Str "r")))
      );
      (* Done *)
+     (Some("two empty ropes - error"),
+      (Rope.Empty, Rope.Empty),
+      Error(Invalid_argument "Wrong rope types for right-left rotation"));
+     (Some("One string rope - error"),
+      (Rope.Cat(2,4,Rope.Str("ab"),Rope.Str("cd")), Rope.Str("ef")),
+      Error(Invalid_argument "Wrong rope types for right-left rotation"));
+     (Some("Longer left child"),
+      (Rope.Cat(3,6,Rope.Str("he"),Rope.Cat(2,4,Rope.Str("ll"),Rope.Str("ow"))),
+       Rope.Cat(2,4,Rope.Str("or"),Rope.Str("ld"))),
+      Ok(Rope.Cat(4,10,
+                  Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),
+                  Rope.Cat(3,6,Rope.Str("ow"),
+                           Rope.Cat(2,4,Rope.Str("or"),Rope.Str("ld"))))));
+     (Some("Stupid tall tree"),
+      (Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("lll"),Rope.Str("llr")),
+                Rope.Cat(2,6,Rope.Str("lrl"),Rope.Str("lrr"))),
+       Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("rll"),Rope.Str("rlr")),
+                Rope.Cat(2,6,Rope.Str("rrl"),Rope.Str("rrr")))),
+      Ok(Rope.Cat(5,24,Rope.Cat(3,9,Rope.Cat(2,6,Rope.Str("lll"),Rope.Str("llr")),
+                                Rope.Str("lrl")),
+                  Rope.Cat(4,15,Rope.Str("lrr"),
+                           Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("rll"),Rope.Str("rlr")),
+                                    Rope.Cat(2,6,Rope.Str("rrl"),Rope.Str("rrr")))))));
+     (Some("Not deep enough for rotation"),
+      (Rope.Cat(2,2,Rope.Str("a"),Rope.Str("b")),
+       Rope.Cat(2,2,Rope.Str("c"),Rope.Str("d"))),
+      Error(Invalid_argument "Wrong rope types for right-left rotation"));
      
    ]
   )
@@ -421,6 +468,29 @@ let rot_left_right_tests =
                    Rope.Cat(2,5,Rope.Str "rlr", Rope.Str "rr")))
      );
      (* TODO *)
+     (Some("two empty ropes - error"),
+      (Rope.Empty, Rope.Empty),
+      Error(Invalid_argument "Wrong rope types for left-right rotation"));
+     (Some("One string rope - error"),
+      (Rope.Cat(2,4,Rope.Str("ab"),Rope.Str("cd")), Rope.Str("ef")),
+      Error(Invalid_argument "Wrong rope types for left-right rotation"));
+     (Some("longer right child"),
+      (Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),
+       Rope.Cat(3,6,Rope.Cat(2,4,Rope.Str("ow"),Rope.Str("or")),Rope.Str("ld"))),
+      Ok(Rope.Cat(4,10,Rope.Cat(3,6,Rope.Cat(2,4,Rope.Str("he"),Rope.Str("ll")),Rope.Str("ow")),Rope.Cat(2,4,Rope.Str("or"),Rope.Str("ld")))));
+     (Some("Stupid tall tree"),
+      (Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("lll"),Rope.Str("llr")),
+                Rope.Cat(2,6,Rope.Str("lrl"),Rope.Str("lrr"))),
+       Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("rll"),Rope.Str("rlr")),
+                Rope.Cat(2,6,Rope.Str("rrl"),Rope.Str("rrr")))),
+      Ok(Rope.Cat(5,24,Rope.Cat(4,15,Rope.Cat(3,12,Rope.Cat(2,6,Rope.Str("lll"),Rope.Str("llr")),
+                                              Rope.Cat(2,6,Rope.Str("lrl"),Rope.Str("lrr"))),
+                                Rope.Str("rll")),
+                  Rope.Cat(3,9,Rope.Str("rlr"),Rope.Cat(2,6,Rope.Str("rrl"),Rope.Str("rrr"))))));
+     (Some("Not deep enough"),
+      (Rope.Cat(2,2,Rope.Str("a"),Rope.Str("b")),
+       Rope.Cat(2,2,Rope.Str("c"),Rope.Str("d"))),
+      Error(Invalid_argument "Wrong rope types for left-right rotation"));
    ]
   )
 
@@ -439,8 +509,9 @@ let create_ok_list = [
     (None,
      (Rope.Str "x", Rope.Str "y"),
      Ok (Rope.Cat(2, 2, Rope.Str "x", Rope.Str "y")));
-    (* TODO: tests also used for balance and cat *)
+    (* DONE: tests also used for balance and cat *)
   ]
+
 let create_all_list =
   create_ok_list
   @ [
@@ -456,6 +527,19 @@ let create_all_list =
                  Rope.Cat(2,2,Rope.Str "x", Rope.Str "y"),
                  Rope.Str "z")),
        Error (Invalid_argument "Rope.create: right too big"));
+      (None,
+       (Rope.Str "ax", Rope.Str "by"),
+        Ok (Rope.Cat(2, 4, Rope.Str "ax", Rope.Str "by")));
+      (None,
+       (Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), Rope.Str "c"),
+        Ok (Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), Rope.Str "c")));
+      (None,
+       (Rope.Str "a", Rope.Cat(2, 2, Rope.Str "b", Rope.Str "c")),
+        Ok (Rope.Cat(3, 3, Rope.Str "a", Rope.Cat(2, 2, Rope.Str "b", Rope.Str "c"))));
+      (None,
+       (Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2, Rope.Str "c", Rope.Str "d")),
+        Ok (Rope.Cat(3, 4, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b"), 
+                           Rope.Cat(2, 2, Rope.Str "c", Rope.Str "d"))));
     ]
 let create_tests =
   ("Rope.create",
@@ -464,6 +548,8 @@ let create_tests =
    rope_pair_printers,
    create_all_list
   )
+
+
 
 (* balance *)
 let bal_helper = rope_pair_helper Rope.bal
@@ -486,8 +572,40 @@ let bal_ok_list =
 let bal_all_list =
   bal_ok_list
   @ [
-      (* TODO *)
-      
+      (* TODO*)
+      (None,
+       (Rope.Str "xa", Rope.Str "yb"),
+       Ok (Rope.Cat(2, 4, Rope.Str "xa", Rope.Str "yb")));
+      (None,
+       (Rope.Str "x", Rope.Cat(4, 4, 
+                        Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
+                          , Rope.Str "c")
+                            , Rope.Str "d")),
+       Error (Invalid_argument "Rope.bal: right unbalanced"));
+      (None,
+       (Rope.Cat(4, 4, 
+                        Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
+                          , Rope.Str "c")
+                            , Rope.Str "d"), Rope.Str "x"),
+       Error (Invalid_argument "Rope.bal: left unbalanced"));
+      (None,
+       (Rope.Cat(4, 8, 
+                        Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
+                        Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "e", Rope.Str "f"), Rope.Cat(2, 2,Rope.Str "g", Rope.Str "h")))
+                        , Rope.Str "x"),
+       Error (Invalid_argument "Rope.bal: left too big"));
+      (None,
+       (Rope.Str "x", Rope.Cat(4, 8, 
+                               Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d")),
+                        Rope.Cat(3, 4, Rope.Cat(2, 2,Rope.Str "e", Rope.Str "f"), Rope.Cat(2, 2,Rope.Str "g", Rope.Str "h")))
+                        ),
+       Error (Invalid_argument "Rope.bal: right too big"));
+      (None,
+       (Rope.Str "x", Rope.Cat(3, 4, 
+                        Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d"))
+                        ),
+       Ok (Rope.Cat(4,5, Rope.Cat(3,3,Rope.Str("x"),Rope.Cat(2,2,Rope.Str("a"),Rope.Str("b"))), Rope.Cat(2,2,Rope.Str("c"),Rope.Str("d")))));
+
     ]
 let bal_tests =
   ("Rope.bal",
@@ -503,7 +621,54 @@ let cat_list =
   bal_ok_list (* handle everything Rope.bal does *)
   @ [ (* and more *)
       (* TODO *)
+      (None,
+       (Rope.Str "xa", Rope.Str "yb"),
+       Ok (Rope.Cat(2, 4, Rope.Str "xa", Rope.Str "yb")));
+
+      (None,
+       (Rope.Cat(4, 4, 
+                        Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
+                          , Rope.Str "c")
+                            , Rope.Str "d"), Rope.Str "x"),
+       Ok (Rope.Cat(5, 5,
+                    Rope.Cat(2,2,Rope.Str "x",Rope.Str "d")
+                    , Rope.Cat(3,3,
+                               Rope.Cat(2,2,Rope.Str "a",Rope.Str "b"),
+                               Rope.Str "c")))
+       );
+
+      (None,
+       (Rope.Str "x", Rope.Cat(4, 4, 
+                        Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
+                          , Rope.Str "c")
+                            , Rope.Str "d")),
+       Ok (Rope.Cat(5, 5,
+                    Rope.Cat(4,4,
+                             Rope.Cat(3,3, 
+                                      Rope.Cat(2,2, Rope.Str "x", Rope.Str "a"),
+                                      Rope.Str "b"),
+                             Rope.Str "c"),
+                    Rope.Str "d")));
+                    
+      (None,
+       (Rope.Str "x", Rope.Cat(4, 5, 
+                        Rope.Cat(3, 3, Rope.Cat(2, 2, Rope.Str "a", Rope.Str "b")
+                          , Rope.Str "c")
+                            , Rope.Cat(2, 2, Rope.Str "d", Rope.Str "e"))),
+       Ok (Rope.Cat(5, 6,
+                    Rope.Cat(4,4,
+                             Rope.Cat(3,3, 
+                                      Rope.Cat(2,2, Rope.Str "x", Rope.Str "a"),
+                                      Rope.Str "b"),
+                             Rope.Str "c"),
+                    Rope.Cat(2, 2, Rope.Str "d", Rope.Str "e"))));
+      (None,
+       (Rope.Str "x", Rope.Cat(3, 4, 
+                        Rope.Cat(2, 2,Rope.Str "a", Rope.Str "b"), Rope.Cat(2, 2,Rope.Str "c", Rope.Str "d"))
+                        ),
+       Ok (Rope.Cat(4, 5, Rope.Cat(3,3,Rope.Cat(2,2,Rope.Str "x", Rope.Str "a"),Rope.Str "b"), Rope.Cat(2,2,Rope.Str "c", Rope.Str "d"))));
     ]
+
 
 let cat_tests =
   ("Rope.cat",
