@@ -15,26 +15,36 @@ module Stream = struct
 
   (* Return the head element of the list *)
   let head(l : 'a t) : 'a  =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+  (* DONE: replace `failwith "unimplemented"` *)
+    match force l with
+    | Cons (head, _) -> head
+    | Nil -> failwith "empty"
 
   (* Return the tail of the list *)
   let tail(l : 'a t) : 'a t  =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+  (* DONE: replace `failwith "unimplemented"` *)
+    match force l with
+    | Cons (_,tail) -> tail
+    | Nil -> failwith "empty"
 
   let nil()  = delay(fun () -> Nil)
 
   (* Create stream from the elements of a list *)
   let rec from_list (l : 'a list) : 'a t =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+  (* DONE: replace `failwith "unimplemented"` *)
+    match l with
+    | first::rest ->
+       let susrest = delay (fun () -> from_list rest) in
+       delay (fun () -> Cons (first, force susrest))
+    | _ -> nil()
 
   (* Fold function f over the stream from the right (end) of the stream. *)
   (* fold_right is a monolithic function *)
   let rec fold_right (f : 'a->'acc->'acc) (s : 'a t) (acc : 'acc) : 'acc =
   (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+    match force s with
+    | Cons (h,t) -> f h (fold_right f t acc)
+    | Nil -> []
 
   let rec to_list s =
     fold_right (fun x l -> x :: l) s []
@@ -173,7 +183,7 @@ let stream_append_tests =
 
 (* reverse *)
 let stream_reverse_tester x = Stream.to_list (Stream.reverse (Stream.from_list x))
-let stream_reverse_printer = Some(str_int_list,str_int_list)
+                                let stream_reverse_printer = Some(str_int_list,str_int_list)
 let stream_reverse_tests =
   ("stream_reverse_list",
    stream_reverse_tester, (=), (=),

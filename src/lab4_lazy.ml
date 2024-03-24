@@ -18,8 +18,14 @@ let delay(f : unit -> 'a) : 'a suspension =
   ref (Unevaluated f)
 
 let rec force(x : 'a suspension) : 'a =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+  (* DONE: replace `failwith "unimplemented"` *)
+    match !x with
+    | Evaluated y -> y
+    | Unevaluated thunk ->
+       let y = thunk () in
+       x := Evaluated y; y
+      
+
 
 ;;
 (*********)
