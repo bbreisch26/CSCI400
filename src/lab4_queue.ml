@@ -33,15 +33,16 @@ module Queue = struct
   (* Invariant: rear length <= front length
      Implied Invariant: a non-empty queue always has a non-empty front stream *)
   let check (q:'a t) : 'a t =
-    (* TODO: replace q *)
-    q
+    match q with
+    | (lenf, f, lenr, r) -> if lenr <= lenf then q else rotate q
 
   let is_empty (q : 'a t) =
     let (lenf, _, _, _) = q in (lenf=0)
 
   let snoc (q:'a t) (x:'a) : 'a t =
-    (* TODO: replace q *)
-    q
+    match q with
+    | (lenf, f, lenr, r) -> check (lenf, f, lenr+1, x::r)
+
 
   let head (q:'a t) : 'a =
   (* TODO: replace `failwith "unimplemented"` *)
@@ -140,6 +141,10 @@ let queue_check_tests =
    [
      (None, ([2;3],[5;4]), Ok(2,[2;3],2,[5;4]));
      (* TODO *)
+     (None, ([1],[3;2]), Ok(3,[1;2;3],0,[]));
+     (None, ([],[3;2]), Ok(2,[2;3],0,[]));
+     (None, ([1;2;3],[5;4]), Ok(3,[1;2;3],2,[5;4]));
+     (None, ([1;2;3],[]), Ok(3,[1;2;3],0,[]));
   ])
 
 (* snoc *)
@@ -155,6 +160,10 @@ let queue_snoc_tests =
    [
      (None, ([1;2],[3],4), Ok (2,[1;2],2,[4;3]));
      (* TODO *)
+     (None, ([1;2;3],[4],5), Ok (3,[1;2;3],2,[5;4]));
+     (None, ([],[],1), Ok (1,[1],0,[]));
+     (None, ([1],[],2), Ok (1,[1],1,[2]));
+     (None, ([1;2],[4;3],5), Ok (5,[1;2;3;4;5],0,[]));
   ])
 
 (* tail *)
