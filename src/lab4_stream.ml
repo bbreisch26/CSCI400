@@ -65,14 +65,25 @@ module Stream = struct
 
   (* Append two streams *)
   let rec append (s1 : 'a t) (s2 : 'a t) : 'a t =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+  (* DONE: replace `failwith "unimplemented"` *)
+    match force s1, force s2 with
+      | Nil, Nil -> nil()
+      | Cons(_,_), Nil -> s1
+      | Nil, Cons(_,_) -> s2
+      | Cons(h,r), Cons(_,_) -> delay(fun () -> Cons(h, append (r) (s2)))
 
   (* Reverse a stream. *)
   (* reverse is a monolithic function *)
   let reverse (s : 'a t) : 'a t =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+  (* DONE: replace `failwith "unimplemented"` *)
+    let rec reverse_helper acc l =
+      match force l with
+        | Nil -> acc
+        | Cons(h,r) -> reverse_helper (h::acc) (r)
+    in 
+    let revList = reverse_helper ([]) (s) in 
+    from_list revList
+         
 
   let rec nth(l : 'a t) (n:int) : 'a =
     if 0 = n
@@ -81,8 +92,12 @@ module Stream = struct
 
   (* Return a stream containing the first n elements of the input stream *)
   let rec prefix (l:'a t) (n:int) : 'a t =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+  (* DONE: replace `failwith "unimplemented"` *)
+    if n <= 0 then nil()
+    else
+      match force l with
+        | Nil -> failwith "Empty Stream"
+        | Cons(h,r) -> delay(fun () -> Cons(h,prefix (r) (n-1)))
 
   let rec suffix (l:'a t) (n:int) : 'a t =
     if n <= 0 then l
@@ -93,20 +108,33 @@ module Stream = struct
 
   (* Map a function over a stream *)
   let rec map (f : 'x -> 'y) (l : 'x t): 'y t =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
-
+  (* DONE: replace `failwith "unimplemented"` *)
+    match force l with
+      | Nil -> nil()
+      | Cons(h,r) -> delay(fun () -> Cons(f h, map f r))
 
   (* Map a function over two streams *)
   let rec map2 (f : 'x -> 'y -> 'z) (l1 : 'x t) (l2 : 'y t)
           : 'z t =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+  (* DONE: replace `failwith "unimplemented"` *)
+    match force l1,force l2 with
+      | Nil, Nil -> nil()
+      | Nil, Cons(_,_) -> failwith "Different Sized Streams"
+      | Cons(_,_), Nil -> failwith "Different Sized Streams"
+      | Cons(h1,r1), Cons(h2,r2) -> delay(fun () -> Cons(f h1 h2, map2 f r1 r2)) 
+
+
 
   (* Filter a stream *)
   let rec filter  (f : 'x -> bool) (l : 'x t) : 'x t =
   (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+    match force l with
+      | Nil -> nil()
+      | Cons(h,r) -> 
+         if f h then 
+           delay(fun () -> Cons(h, filter f r))
+         else
+           filter f r
 
 
 end
