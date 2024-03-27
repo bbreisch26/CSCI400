@@ -46,15 +46,26 @@ module Queue = struct
 
   let head (q:'a t) : 'a =
   (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+    match q with
+    | (_, a, _, _) ->
+      match force a with
+      | Cons(x, r) -> x
+      | Nil -> raise Empty 
+  
 
   let tail (q:'a t) : 'a t =
   (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+    match q with
+    | (a, b, c, d) ->
+      match force b with
+      | Cons(h, r) -> check (a-1, r, c, d)
+      | Nil -> raise Empty
 
   let rec fold_right (f : 'a -> 'acc -> 'acc ) (q : 'a t) (acc : 'acc) : 'acc =
   (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+    match q with
+    | (a, b, c, d) -> Stream.fold_right f b acc
+  (*failwith "unimplemented"*)
 
   let from_lists (f : 'a list) (r : 'a list) : 'a t =
     (List.length f, Stream.from_list f, List.length r, r)
@@ -127,6 +138,9 @@ let queue_head_tests =
    [
      (None, ([3;4],[4;5]), Ok 3);
      (* TODO *)
+     (None, ([3],[4;5]), Ok 3);
+     (None, ([3;4],[]), Ok 3);
+     (*(None, ([],[4;5]), Ok Queue.Empty);*)
   ])
 
 (* check *)
