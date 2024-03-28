@@ -93,10 +93,10 @@ module Stream = struct
   (* Return a stream containing the first n elements of the input stream *)
   let rec prefix (l:'a t) (n:int) : 'a t =
   (* DONE: replace `failwith "unimplemented"` *)
-    if n <= 0 then nil()
+    if n <= 0 then (if force l == Nil then failwith "Stream.prefix: Stream too short" else nil())
     else
       match force l with
-        | Nil -> failwith "Empty Stream"
+        | Nil -> failwith "Stream.prefix: Stream too short"
         | Cons(h,r) -> delay(fun () -> Cons(h,prefix (r) (n-1)))
 
   let rec suffix (l:'a t) (n:int) : 'a t =
@@ -119,15 +119,15 @@ module Stream = struct
   (* DONE: replace `failwith "unimplemented"` *)
     match force l1,force l2 with
       | Nil, Nil -> nil()
-      | Nil, Cons(_,_) -> failwith "Different Sized Streams"
-      | Cons(_,_), Nil -> failwith "Different Sized Streams"
+      | Nil, Cons(_,_) -> failwith "Stream.map2: Different Sized Streams"
+      | Cons(_,_), Nil -> failwith "Stream.map2: Different Sized Streams"
       | Cons(h1,r1), Cons(h2,r2) -> delay(fun () -> Cons(f h1 h2, map2 f r1 r2)) 
 
 
 
   (* Filter a stream *)
   let rec filter  (f : 'x -> bool) (l : 'x t) : 'x t =
-  (* TODO: replace `failwith "unimplemented"` *)
+  (* DONE: replace `failwith "unimplemented"` *)
     match force l with
       | Nil -> nil()
       | Cons(h,r) -> 
@@ -205,7 +205,12 @@ let stream_append_tests =
    stream_append_printer,
    [
      (None, ([1;2;3],[4;5;6]), Ok [1;2;3;4;5;6]);
-     (* TODO *)
+     (* DONE *)
+     (Some "Two Empty Streams", ([],[]), Ok []);
+     (Some "First List Empty", ([],[1;2;3]), Ok [1;2;3]);
+     (Some "Second List Empty", ([1;2;3],[]), Ok [1;2;3]);
+     (Some "Long Lists", ([1;2;3;4;5;6;7;8;9;10],[11;12;13;14;15;16;17;18;19;20]), Ok [1;2;3;4;5;6;7;8;9;10;11;12;13;14;        15;16;17;18;19;20]);
+     (Some "Long and Short Lists", ([1;2;3;4;5;6;7;8;9;10],[11;12]), Ok [1;2;3;4;5;6;7;8;9;10;11;12]);
   ])
 
 
@@ -218,7 +223,11 @@ let stream_reverse_tests =
    stream_reverse_printer,
    [
      (None, [1;2;3], Ok [3;2;1]);
-     (* TODO *)
+     (* DONE *)
+     (Some "Empty Stream", [], Ok []);
+     (Some "Short Stream", [1;2], Ok [2;1]);
+     (Some "Long Stream", [1;2;3;4;5;6;7;8;9;10], Ok [10;9;8;7;6;5;4;3;2;1]);
+     (Some "Duplicate Values", [1;2;2;3;3;4;5;6;6;7], Ok [7;6;6;5;4;3;3;2;2;1]);
   ])
 
 
@@ -246,7 +255,12 @@ let stream_prefix_tests =
    stream_prefix_printer,
    [
      (None, ([0;1;2],2), Ok [0;1]);
-     (* TODO *)
+     (* DONE *)
+     (Some "Empty Stream", ([],2), Error (Failure "Stream.prefix: Stream too short"));
+     (Some "n Value of 0", ([1;2;3;4;5],0), Ok []);
+     (Some "Empty Stream and n Value of 0", ([],0), Error (Failure "Stream.prefix: Stream too short"));
+     (Some "Long Stream", ([1;2;3;4;5;6;7;8;9;10],9), Ok [1;2;3;4;5;6;7;8;9]);
+     (Some "Stream Too Short", ([1;2;3;4;5],6), Error (Failure "Stream.prefix: Stream too short"));
   ])
 
 (* suffix *)
@@ -258,7 +272,11 @@ let stream_suffix_tests =
    stream_suffix_printer,
    [
      (None, ([0;1;2],0), Ok [0;1;2]);
-     (* TODO *)
+     (* DONE *)
+     (Some "Empty Stream", ([],1), Error (Failure "empty"));
+     (Some "Long Stream Short Suffix", ([1;2;3;4;5;6;7;8;9;10],8), Ok [9;10]);
+     (Some "Long Stream Long Suffix", ([1;2;3;4;5;6;7;8;9;10],2), Ok [3;4;5;6;7;8;9;10]);
+     (Some "Stream Too Short", ([1;2;3;4;5],6), Error (Failure "empty"));
   ])
 
 (* map *)
@@ -270,7 +288,12 @@ let stream_map_tests =
    stream_map_printer,
    [
      (None, ((fun x->1+x), [0;1;2]), Ok [1;2;3]);
-     (* TODO *)
+     (* DONE *)
+     (Some "Map with Subtraction", ((fun x -> x - 2), [1;2;3;4;5]), Ok [-1;0;1;2;3]);
+     (Some "Map with Multiplication", ((fun x -> x * 5), [1;2;3;4;5]), Ok [5;10;15;20;25]);
+     (Some "Map with Division", ((fun x -> x / 5), [5;10;15;20;25]), Ok [1;2;3;4;5]); 
+     (Some "Map with Addition", ((fun x -> x + 2), [1;2;3;4;5]), Ok [3;4;5;6;7]);
+
   ])
 
 (* map2 *)
@@ -282,8 +305,15 @@ let stream_map2_tests =
    stream_map2_printer,
    [
      (None, ((+), [0;1;2], [4;5;6]), Ok [4;6;8]);
-     (* TODO *)
-  ])
+     (* DONE *)
+     (Some "Empty Streams", ((+), [], []), Ok []);
+     (Some "Only First Stream Empty", ((+), [], [1;2;3]), Error (Failure "Stream.map2: Different Sized Streams"));
+     (Some "Only Second Stream Empty", ((+), [1;2;3], []), Error (Failure "Stream.map2: Different Sized Streams"));
+     (Some "Map2 with Addition", ((+), [1;2;3;4;5], [2;3;4;5;6]), Ok [3;5;7;9;11]);
+     (Some "Map2 with Subtraction", ((-), [1;2;3;4;5], [2;3;4;5;6]), Ok [-1;-1;-1;-1;-1]);
+     (Some "Map2 with Mutiplication", ((fun x y -> x * y), [1;2;3;4;5], [1;2;3;4;5]), Ok [1;4;9;16;25]);
+     (Some "Map2 with Division", ((/), [1;2;3;4;5], [1;2;3;4;5]), Ok [1;1;1;1;1]);
+   ])
 
 (* filter *)
 let stream_filter_tester (f,x) = Stream.to_list (Stream.filter f (Stream.from_list x))
@@ -294,5 +324,9 @@ let stream_filter_tests =
    stream_filter_printer,
    [
      (None, ((fun x-> (x mod 2) = 0), [0;1;2;3;4;5;6]), Ok [0;2;4;6]);
-     (* TODO *)
+     (* DONE *)
+     (Some "Empty Stream", ((fun x -> x == 0), []), Ok []);
+     (Some "Duplicate Values", ((fun x -> (x mod 2) == 0), [0;0;1;1;2;2;3;3;4;4;5;5]), Ok [0;0;2;2;4;4]);
+     (Some "Filters No Elements", ((fun x -> x > 0), [1;2;3;4;5;6;7;8;9;10]), Ok [1;2;3;4;5;6;7;8;9;10]);
+     (Some "Filters Every Element", ((fun x -> x < 0), [1;2;3;4;5;6;7;8;9;10]), Ok []);
   ])
