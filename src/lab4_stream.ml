@@ -18,14 +18,14 @@ module Stream = struct
   (* DONE: replace `failwith "unimplemented"` *)
     match force l with
     | Cons (head, _) -> head
-    | Nil -> failwith "empty"
+    | Nil -> raise IndexError
 
   (* Return the tail of the list *)
   let tail(l : 'a t) : 'a t  =
   (* DONE: replace `failwith "unimplemented"` *)
     match force l with
     | Cons (_,tail) -> tail
-    | Nil -> failwith "empty"
+    | Nil -> raise IndexError
 
   let nil()  = delay(fun () -> Nil)
 
