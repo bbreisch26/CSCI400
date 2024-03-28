@@ -281,10 +281,10 @@ let stream_suffix_tests =
    [
      (None, ([0;1;2],0), Ok [0;1;2]);
      (* DONE *)
-     (Some "Empty Stream", ([],1), Error (Failure "empty"));
+     (Some "Empty Stream", ([],1), Error Stream.IndexError);
      (Some "Long Stream Short Suffix", ([1;2;3;4;5;6;7;8;9;10],8), Ok [9;10]);
      (Some "Long Stream Long Suffix", ([1;2;3;4;5;6;7;8;9;10],2), Ok [3;4;5;6;7;8;9;10]);
-     (Some "Stream Too Short", ([1;2;3;4;5],6), Error (Failure "empty"));
+     (Some "Stream Too Short", ([1;2;3;4;5],6), Error Stream.IndexError);
   ])
 
 (* map *)
