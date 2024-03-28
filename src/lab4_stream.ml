@@ -18,14 +18,14 @@ module Stream = struct
   (* DONE: replace `failwith "unimplemented"` *)
     match force l with
     | Cons (head, _) -> head
-    | Nil -> failwith "empty"
+    | Nil -> raise IndexError
 
   (* Return the tail of the list *)
   let tail(l : 'a t) : 'a t  =
   (* DONE: replace `failwith "unimplemented"` *)
     match force l with
     | Cons (_,tail) -> tail
-    | Nil -> failwith "empty"
+    | Nil -> raise IndexError
 
   let nil()  = delay(fun () -> Nil)
 
@@ -41,7 +41,7 @@ module Stream = struct
   (* Fold function f over the stream from the right (end) of the stream. *)
   (* fold_right is a monolithic function *)
   let rec fold_right (f : 'a->'acc->'acc) (s : 'a t) (acc : 'acc) : 'acc =
-  (* TODO: replace `failwith "unimplemented"` *)
+  (* DONE: replace `failwith "unimplemented"` *)
     match force s with
     | Cons (h,t) -> f h (fold_right f t acc)
     | Nil -> []
@@ -52,16 +52,18 @@ module Stream = struct
   (* Create a stream by applying function f to produce successive elements. *)
   (* applying f to element i will produce element i+1 *)
   let rec seed (f : 'a -> 'a) (x : 'a) =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+    (* DONE: replace `failwith "unimplemented"` *)
+   delay (fun () -> Cons(x, seed f (f x)))
+  
 
   (* Create a stream by applying function f to produce successive elements. *)
   (* applying f to (x_i,y_i) will produce (x_{i+1}, y_{i+1}, where
      each x represents stream elements and each y some additional
      parameter *)
   let rec seed2 (f : ('a*'b) -> ('a*'b)) ((x,y) : ('a *'b)) =
-  (* TODO: replace `failwith "unimplemented"` *)
-  failwith "unimplemented"
+    (* TODO: replace `failwith "unimplemented"` *)
+    delay(fun() -> Cons(x, seed2 f (f (x, y))))
+    
 
   (* Append two streams *)
   let rec append (s1 : 'a t) (s2 : 'a t) : 'a t =
@@ -175,8 +177,11 @@ let stream_seed_tests =
         x),
        42, 5),
       Ok [42; 11355432; 2836018348; 476557059; 3648046016]);
-     (* TODO: fix the lambda function in the following test case *)
-     (Some "zeno", ((fun x -> x), 256, 5), Ok [256;128;64;32;16]);
+     (* DONE: fix the lambda function in the following test case *)
+     (Some "zeno", ((fun x -> x/2), 256, 5), Ok [256;128;64;32;16]);
+     (Some "zero", ((fun x -> x), 0, 5), Ok [0;0;0;0;0]);
+     (Some "square", ((fun x -> x*x), 2, 4), Ok [2;4;16;256]);
+     (Some "fixed", ((fun x-> 123), 0, 4), Ok [0;123;123;123]);
   ])
 
 let stream_seed2_tester (f,xi,n) = Stream.to_list (Stream.prefix (Stream.seed2 f xi) n)
@@ -188,8 +193,11 @@ let stream_seed2_tests =
    stream_seed2_printer,
    [
      (Some "fact", ((fun (x,i) -> (x*i,i+1)), (1,1), 5), Ok [1; 1; 2; 6; 24]);
-     (* TODO: fix the lambda function in the following test case *)
-     (Some "fib", ((fun (x,xm) -> (x,x)), (0,1), 8), Ok[0; 1; 1; 2; 3; 5; 8; 13] );
+     (* DONE: fix the lambda function in the following test case *)
+     (Some "fib", ((fun (x,xm) -> (xm,x+xm)), (0,1), 8), Ok[0; 1; 1; 2; 3; 5; 8; 13] );
+     (Some "powers2", ((fun (x,y) -> (x*y,y)), (1,2), 4), Ok[1;2;4;8]);
+     (Some "fixed", ((fun (x,y) -> (x,y)), (0,1), 4), Ok[0;0;0;0]);
+     (Some "swap", ((fun (x,y) -> (y,x)), (0,1), 4), Ok[0;1;0;1]);
   ])
 
 (* append *)
