@@ -179,6 +179,9 @@ let stream_seed_tests =
       Ok [42; 11355432; 2836018348; 476557059; 3648046016]);
      (* DONE: fix the lambda function in the following test case *)
      (Some "zeno", ((fun x -> x/2), 256, 5), Ok [256;128;64;32;16]);
+     (Some "zero", ((fun x -> x), 0, 5), Ok [0;0;0;0;0]);
+     (Some "square", ((fun x -> x*x), 2, 4), Ok [2;4;16;256]);
+     (Some "fixed", ((fun x-> 123), 0, 4), Ok [0;123;123;123]);
   ])
 
 let stream_seed2_tester (f,xi,n) = Stream.to_list (Stream.prefix (Stream.seed2 f xi) n)
@@ -192,6 +195,9 @@ let stream_seed2_tests =
      (Some "fact", ((fun (x,i) -> (x*i,i+1)), (1,1), 5), Ok [1; 1; 2; 6; 24]);
      (* DONE: fix the lambda function in the following test case *)
      (Some "fib", ((fun (x,xm) -> (xm,x+xm)), (0,1), 8), Ok[0; 1; 1; 2; 3; 5; 8; 13] );
+     (Some "powers2", ((fun (x,y) -> (x*y,y)), (1,2), 4), Ok[1;2;4;8]);
+     (Some "fixed", ((fun (x,y) -> (x,y)), (0,1), 4), Ok[0;0;0;0]);
+     (Some "swap", ((fun (x,y) -> (y,x)), (0,1), 4), Ok[0;1;0;1]);
   ])
 
 (* append *)
