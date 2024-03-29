@@ -19,15 +19,17 @@ module Queue = struct
 
   exception Empty
 
+
   let rotate (q: 'a t) : 'a t  =
     let rec append_rev (f: 'a Stream.t) (r : 'a list) : 'a Stream.t  =
       (* return a stream of f followed by the reverse of r.  Only
          realize the reversal of r when we reach the end of f *)
       (let thunk () =
-         (* TODO: replace Stream.Nil *)
-             Stream.Nil
-       in delay thunk) in
-    let (lenf, f, lenr, r) = q in
+        match f with
+        | Stream.Nil -> Stream.from_list (List.rev r)
+        | Stream.Cons (first, rest) -> Stream.Cons (first (append_rev rest r))
+       in delay thunk) in 
+    let (lenf, f, lenr, r) = q in 
     (lenf+lenr, append_rev f r, 0, [])
 
   (* Invariant: rear length <= front length
