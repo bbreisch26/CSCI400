@@ -197,7 +197,7 @@ let queue_tail_tests =
    [
      (None, ([1;2],[4;3]), Ok(3,[2;3;4],0,[]));
      (* TODO *)
-     (Some, ([],[4;3]), Error Queue.Empty);
+     (None, ([],[4;3]), Error Queue.Empty);
      (None, ([1;2],[]), Ok(1,[2],0,[]));
      (None, ([1],[4;3;2]), Ok(3,[2;3;4],0,[]));
      (None, ([1;2;3],[4]), Ok(2,[2;3],1,[4]));
