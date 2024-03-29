@@ -24,13 +24,14 @@ module Queue = struct
     let rec append_rev (f: 'a Stream.t) (r : 'a list) : 'a Stream.t  =
       (* return a stream of f followed by the reverse of r.  Only
          realize the reversal of r when we reach the end of f *)
-      (let thunk () =
         match force f with 
-        | Stream.Nil -> Stream.from_list (List.rev r)
+        | Stream.Nil ->  Stream.from_list (List.rev r)
         | Stream.Cons (first, rest) -> delay (fun() -> Stream.Cons (first, (append_rev rest r)))
-       in delay thunk) in 
-    let (lenf, f, lenr, r) = q in 
-    (lenf+lenr, append_rev f r, 0, [])
+    in
+    match q with
+    | (lenf, f, lenr, r) -> (lenf+lenr, append_rev f r, 0, [])
+    (*let (lenf, f, lenr, r) = q in 
+    (lenf+lenr, append_rev f r, 0, [])*)
 
   (* Invariant: rear length <= front length
      Implied Invariant: a non-empty queue always has a non-empty front stream *)
