@@ -33,6 +33,7 @@ module Queue = struct
     (*let (lenf, f, lenr, r) = q in 
     (lenf+lenr, append_rev f r, 0, [])*)
 
+
   (* Invariant: rear length <= front length
      Implied Invariant: a non-empty queue always has a non-empty front stream *)
   let check (q:'a t) : 'a t =
@@ -143,7 +144,8 @@ let queue_head_tests =
      (* TODO *)
      (None, ([3],[4;5]), Ok 3);
      (None, ([3;4],[]), Ok 3);
-     (*(None, ([],[4;5]), Ok Queue.Empty);*)
+     (None, ([],[4;5]), Error Queue.Empty);
+     (None, ([3;4;5;6;7],[8]), Ok 3);
   ])
 
 (* check *)
@@ -195,4 +197,8 @@ let queue_tail_tests =
    [
      (None, ([1;2],[4;3]), Ok(3,[2;3;4],0,[]));
      (* TODO *)
+     (Some, ([],[4;3]), Error Queue.Empty);
+     (None, ([1;2],[]), Ok(1,[2],0,[]));
+     (None, ([1],[4;3;2]), Ok(3,[2;3;4],0,[]));
+     (None, ([1;2;3],[4]), Ok(2,[2;3],1,[4]));
   ])
