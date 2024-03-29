@@ -25,9 +25,9 @@ module Queue = struct
       (* return a stream of f followed by the reverse of r.  Only
          realize the reversal of r when we reach the end of f *)
       (let thunk () =
-        match f with
+        match force f with 
         | Stream.Nil -> Stream.from_list (List.rev r)
-        | Stream.Cons (first, rest) -> Stream.Cons (first (append_rev rest r))
+        | Stream.Cons (first, rest) -> delay (fun() -> Stream.Cons (first, (append_rev rest r)))
        in delay thunk) in 
     let (lenf, f, lenr, r) = q in 
     (lenf+lenr, append_rev f r, 0, [])
