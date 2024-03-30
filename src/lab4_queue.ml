@@ -30,9 +30,6 @@ module Queue = struct
     in
     match q with
     | (lenf, f, lenr, r) -> (lenf+lenr, append_rev f r, 0, [])
-    (*let (lenf, f, lenr, r) = q in 
-    (lenf+lenr, append_rev f r, 0, [])*)
-
 
   (* Invariant: rear length <= front length
      Implied Invariant: a non-empty queue always has a non-empty front stream *)
@@ -49,7 +46,7 @@ module Queue = struct
 
 
   let head (q:'a t) : 'a =
-  (* TODO: replace `failwith "unimplemented"` *)
+  (* DONE: replace `failwith "unimplemented"` *)
     match q with
     | (_, a, _, _) ->
       match force a with
@@ -58,7 +55,7 @@ module Queue = struct
   
 
   let tail (q:'a t) : 'a t =
-  (* TODO: replace `failwith "unimplemented"` *)
+  (* DONE: replace `failwith "unimplemented"` *)
     match q with
     | (a, b, c, d) ->
       match force b with
@@ -66,10 +63,9 @@ module Queue = struct
       | Nil -> raise Empty
 
   let rec fold_right (f : 'a -> 'acc -> 'acc ) (q : 'a t) (acc : 'acc) : 'acc =
-  (* TODO: replace `failwith "unimplemented"` *)
+  (* DONE: replace `failwith "unimplemented"` *)
     match q with
     | (a, b, c, d) -> Stream.fold_right f b acc
-  (*failwith "unimplemented"*)
 
   let from_lists (f : 'a list) (r : 'a list) : 'a t =
     (List.length f, Stream.from_list f, List.length r, r)
@@ -141,7 +137,7 @@ let queue_head_tests =
    queue_head_printer,
    [
      (None, ([3;4],[4;5]), Ok 3);
-     (* TODO *)
+     (* DONE *)
      (None, ([3],[4;5]), Ok 3);
      (None, ([3;4],[]), Ok 3);
      (None, ([],[4;5]), Error Queue.Empty);
@@ -159,7 +155,7 @@ let queue_check_tests =
    queue_check_printer,
    [
      (None, ([2;3],[5;4]), Ok(2,[2;3],2,[5;4]));
-     (* TODO *)
+     (* DONE *)
      (None, ([1],[3;2]), Ok(3,[1;2;3],0,[]));
      (None, ([],[3;2]), Ok(2,[2;3],0,[]));
      (None, ([1;2;3],[5;4]), Ok(3,[1;2;3],2,[5;4]));
@@ -178,7 +174,7 @@ let queue_snoc_tests =
    queue_snoc_printer,
    [
      (None, ([1;2],[3],4), Ok (2,[1;2],2,[4;3]));
-     (* TODO *)
+     (* DONE *)
      (None, ([1;2;3],[4],5), Ok (3,[1;2;3],2,[5;4]));
      (None, ([],[],1), Ok (1,[1],0,[]));
      (None, ([1],[],2), Ok (1,[1],1,[2]));
@@ -196,7 +192,7 @@ let queue_tail_tests =
    queue_tail_printer,
    [
      (None, ([1;2],[4;3]), Ok(3,[2;3;4],0,[]));
-     (* TODO *)
+     (* DONE *)
      (None, ([],[4;3]), Error Queue.Empty);
      (None, ([1;2],[]), Ok(1,[2],0,[]));
      (None, ([1],[4;3;2]), Ok(3,[2;3;4],0,[]));
