@@ -104,7 +104,7 @@ build/javascript_lexer.ml: src/javascript_lexer.mll
 # TODO: add -v and --strict flags
 build/javascript_parser.ml: src/javascript_parser.mly
 	@mkdir -p build
-	cd build && ocamlyacc -bjavascript_parser ../src/javascript_parser.mly
+	cd build && ocamlyacc -v --strict -bjavascript_parser ../src/javascript_parser.mly
 
 build/javascript_parser.$(CMI): build/javascript_parser.ml build/javascript_ast.$(CMO)
 	$(OCAMLC) $(OCAML_FLAGS) -c build/javascript_parser.mli
@@ -136,6 +136,7 @@ endif
 ####################
 
 build/javascript_heap.$(CMO): build/util.$(CMO) build/javascript_ast.$(CMO)
+build/javascript_env.$(CMO): build/util.$(CMO) build/javascript_ast.$(CMO)
 
 # Template for evaluator-file labs
 define EVAL_TEMPLATE =
@@ -156,8 +157,8 @@ endif
 endef
 
 $(eval $(call EVAL_TEMPLATE,6))
-$(eval $(call EVAL_TEMPLATE,7))
-$(eval $(call EVAL_TEMPLATE,8,javascript_heap.$(CMO)))
+$(eval $(call EVAL_TEMPLATE,7,javascript_env.$(CMO)))
+$(eval $(call EVAL_TEMPLATE,8,javascript_env.$(CMO) javascript_heap.$(CMO)))
 
 
 # $(eval $(call EVAL_TEMPLATE,9))
