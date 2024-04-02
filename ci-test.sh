@@ -1,7 +1,7 @@
 #! /bin/bash
 
 
-result=$(./lab5)
+result=$(make lab5_test)
 if echo $result | grep -q "FAIL"; then
 	echo "$result"
 	echo "Lab5 failed some tests, check output"
