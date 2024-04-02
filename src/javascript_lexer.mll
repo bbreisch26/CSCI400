@@ -83,8 +83,10 @@ rule token = parse
   (* TODO: Fix the rule for numbers *)
   (* Include support for: *)
   (* - decimal: e.g., 1, 10 *)
+  (* No leading zeros, must be decimal digits 1-9 *)
   | (['1'-'9'])* ['0'-'9']
   (* - binary: e.g., 0b1, 0B10 *)
+  (* Leading zeros allowed after 0b? *)
   | ("0b" | "0B") (['0'-'1'])*
   (* - octal: e.g., 0o1, 0O17 *)
   (* - hexadecimal: e.g., 0x1, 0Xff, 0x10aAfF *)
@@ -105,6 +107,9 @@ rule token = parse
 
   (* Identifiers *)
   (* TODO: Fix the rule for identifiers *)
+  (* see w3 schools article on javascript variables*)
+  (* case sensitive, can contain letters, digits, underscores, and dollar signs*)
+  (* must begin with letter, dollar sign, or underscore *)
   | ("foo" | "bar")
      as x {IDENT(x)}
 
