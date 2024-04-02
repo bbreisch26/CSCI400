@@ -36,7 +36,9 @@ rule token = parse
   | "return"    {RET_KW}
   | "let"       {LET_KW}
   | "const"     {CONST_KW}
-  (* TODO: Add rules for true and false keywords *)
+  (* DONE: Add rules for true and false keywords *)
+  | "true"      {TRUE_KW}
+  | "false" 	{FALSE_KW}
   | "Infinity"  {INFINITY_KW}
   | "NaN"       {NAN_KW}
   | "log"       {LOG_KW}
@@ -53,7 +55,11 @@ rule token = parse
   | ">="        {GEQ_OP}
   | '<'         {LT_OP}
   | "<="        {LEQ_OP}
-  (* TODO: Add rules for +, -, /, and * operators*)
+  (* DONE: Add rules for +, -, /, and * operators*)
+  | '+'	        {ADD_OP}
+  | '-'		{SUB_OP}
+  | '/'		{DIV_OP}
+  | '*'		{MUL_OP}
   | '='         {ASSIGN_OP}
   | '?'         {COND_OP}
   | ':'         {COLON_OP}
@@ -77,7 +83,9 @@ rule token = parse
   (* TODO: Fix the rule for numbers *)
   (* Include support for: *)
   (* - decimal: e.g., 1, 10 *)
+  | (['1'-'9'])* ['0'-'9']
   (* - binary: e.g., 0b1, 0B10 *)
+  | ("0b" | "0B") (['0'-'1'])*
   (* - octal: e.g., 0o1, 0O17 *)
   (* - hexadecimal: e.g., 0x1, 0Xff, 0x10aAfF *)
   (* - floating point: e.g., 123., 123.456, .123 *)
