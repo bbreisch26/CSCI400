@@ -105,7 +105,7 @@ rule token = parse
     as x {(let _ = count_newlines x lexbuf in (); token lexbuf)}
 
   (* Identifiers *)
-  (* TODO: Fix the rule for identifiers *)
+  (* DONE: Fix the rule for identifiers *)
   (* see w3 schools article on javascript variables*)
   (* case sensitive, can contain letters, digits, underscores, and dollar signs*)
   (* must begin with letter, dollar sign, or underscore *)

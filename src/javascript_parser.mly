@@ -55,7 +55,7 @@
 %token BLANKS         /* [ ]\r\n\t */
 
 /* starting with lowest precedence: */
-/* TODO: fix associativity and precedence */
+/* DONE: fix associativity and precedence */
 %nonassoc COLON_OP
 %nonassoc COND_OP
 %left LOG_OR_OP
@@ -114,7 +114,7 @@ expr:
   | expr DOT_OP IDENT { FieldExpr(get_current_pos (),$1,$3) }
   | LCB_KW field_list RCB_KW { ObjectExpr(get_current_pos (),$2) }
   | LP_KW expr RP_KW { $2 }
-  /* TODO: Add rules for arithmetic */
+  /* DONE: Add rules for arithmetic */
   /* - Binary Operators: +,-,*,/ */
   | expr ADD_OP expr { BopExpr(get_current_pos (), $1, PlusBop, $3)}
   | expr SUB_OP expr { BopExpr(get_current_pos (), $1, MinusBop, $3)}
@@ -172,10 +172,11 @@ expr_list_rest:
 ;
 
 
-/* TODO: fix ident_list to allow more than one identifier */
+/* DONE: fix ident_list to allow more than one identifier */
 ident_list:
   | empty { [] }
-  | IDENT { [$1] }
+  /*| IDENT { [$1] }*/
+  | IDENT ident_list_rest { $1::(List.rev $2)}
 ;
 
 ident_list_rest:
