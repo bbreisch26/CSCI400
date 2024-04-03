@@ -65,6 +65,9 @@
 %nonassoc LOG_NOT_OP
 %left DOT_OP
 %nonassoc LP_KW
+/*Added here, * and / are above + and -*/
+%nonassoc ADD_OP SUB_OP
+%nonassoc MUL_OP DIV_OP
 /*(* ^^ highest precedence / tightest binding *)*/
 
 %start start /*(* the entry point *)*/
@@ -113,7 +116,13 @@ expr:
   | LP_KW expr RP_KW { $2 }
   /* TODO: Add rules for arithmetic */
   /* - Binary Operators: +,-,*,/ */
+  | expr ADD_OP expr { BopExpr(get_current_pos (), $1, PlusBop, $3)}
+  | expr SUB_OP expr { BopExpr(get_current_pos (), $1, MinusBop, $3)}
+  | expr MUL_OP expr { BopExpr(get_current_pos (), $1, TimesBop, $3)}
+  | expr DIV_OP expr { BopExpr(get_current_pos (), $1, DivBop, $3)}
   /* - Unary Operators: +,- */
+  | ADD_OP expr { UopExpr(get_current_pos (), PosUop, $2)}
+  | SUB_OP expr { UopExpr(get_current_pos (), NegUop, $2)}
 ;
 
 value:
