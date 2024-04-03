@@ -80,22 +80,21 @@ rule token = parse
          }
 
   (* Begin Numbers  *)
-  (* TODO: Fix the rule for numbers *)
+  (* DONE: Fix the rule for numbers *)
   (* Include support for: *)
+  (* Leading zeros allowed according to NTD 4/2 help sesh*)
   (* - decimal: e.g., 1, 10 *)
-  (* No leading zeros, must be decimal digits 1-9 *)
-  | (['1'-'9'])* ['0'-'9']
+  | ['0'-'9']*
   (* - binary: e.g., 0b1, 0B10 *)
-  (* Leading zeros allowed after 0b? *)
-  | ("0b" | "0B") (['0'-'1'])*
+  | ("0b" | "0B") ['0'-'1']*
   (* - octal: e.g., 0o1, 0O17 *)
+  | ("0o" | "0O") ['0' - '7']*
   (* - hexadecimal: e.g., 0x1, 0Xff, 0x10aAfF *)
+  | ("0x" | "0X") ['0'-'9' 'a'-'f' 'A'-'F']*
   (* - floating point: e.g., 123., 123.456, .123 *)
+  | ['0'-'9']* '.' ['0'-'9']*
   (* - scientific notation: e.g., 123e5, 123.E5, 123.456e-5, .123e100 *)
-  |  "0"
-  |  "1"
-  |  "2"
-  |  "42"
+  | ['0'-'9']* exponent
    as x {NUMBER(js_float_of_string x )}
 
   (* End Numbers  *)
@@ -110,7 +109,7 @@ rule token = parse
   (* see w3 schools article on javascript variables*)
   (* case sensitive, can contain letters, digits, underscores, and dollar signs*)
   (* must begin with letter, dollar sign, or underscore *)
-  | ("foo" | "bar")
+  | (('$' | '_' | ['a'-'z' 'A'-'Z']) ['a'-'z' 'A'-'Z' '$' '_' '1'-'9']*)
      as x {IDENT(x)}
 
   (* End of File *)
