@@ -18,6 +18,18 @@ let lexer_tests =
       "1 + 2",
       Ok([NUMBER(1.0); ADD_OP; NUMBER(2.0); EOF]));
      (* TODO *)
+     (Some("Simple binary"),
+      "0b111 + 0B0001",
+      Ok([NUMBER(7.0); ADD_OP; NUMBER(1.0); EOF]));
+     (Some("Simple octal"),
+      "0o7 / 0O12",
+      Ok([NUMBER(7.0); DIV_OP; NUMBER(10.0); EOF]));
+     (Some("Simple hex"),
+      "0x1337 * 0XCafEBabE",
+      Ok([NUMBER(4919.0); MUL_OP; NUMBER(3405691582.0); EOF]));
+     (Some("Simple float"),
+      "123.0 - .123",
+      Ok([NUMBER(123.0); SUB_OP; NUMBER(0.123); EOF]));
 
    ])
 
