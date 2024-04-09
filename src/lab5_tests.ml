@@ -95,5 +95,44 @@ let parser_tests =
                                  None (* typ_t option *)
                                 )))));
        (* TODO *)
+       (Some("Variable declaration with let"),
+       "let a = 5;",
+       Ok(StmtProgram(NoPos, 
+                      LetStmt(NoPos, "a", 
+                              ValExpr(NoPos, NumVal(5.0))), 
+                      ExprProgram(NoPos,
+                                  ValExpr(NoPos, UndefVal)))));
+
+      (Some("Ternary operation"),
+      "a > b ? a : b",
+      Ok(ExprProgram(NoPos, 
+                      IfExpr(NoPos, 
+                            BopExpr(NoPos, VarExpr(NoPos, "a"), GtBop, VarExpr(NoPos, "b")),
+                            VarExpr(NoPos, "a"),
+                            VarExpr(NoPos, "b")))));
+
+      (Some("Complex expression"),
+      "3 + 4 * (2 - 1) / 5",
+      Ok(ExprProgram(NoPos,
+                      BopExpr(NoPos,
+                              ValExpr(NoPos, NumVal(3.0)),
+                              PlusBop,
+                              BopExpr(NoPos,
+                                      BopExpr(NoPos, 
+                                              ValExpr(NoPos, NumVal(4.0)), 
+                                              TimesBop, 
+                                              BopExpr(NoPos, 
+                                                      ValExpr(NoPos, NumVal(2.0)), 
+                                                      MinusBop, 
+                                                      ValExpr(NoPos, NumVal(1.0)))),
+                                      DivBop,
+                                      ValExpr(NoPos, NumVal(5.0)))))));
+                           
+                           
+
+
+      
+      
+      
 
   ])
