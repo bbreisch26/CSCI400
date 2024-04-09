@@ -81,6 +81,17 @@ and eval_expr (e:expr_t) : value_t =  match e with
   (* Need to expand this to choose between bool && and float/int && *)
   | BopExpr(_,e1,AndBop,e2) ->
      BoolVal(to_bool (eval_expr e1) && to_bool (eval_expr e2))
+  (* Task 2: console.log *)
+  | PrintExpr(_,e) ->
+     print_string ( to_str (eval_expr e));
+     UndefVal
+  (* Task 3: conditional *)
+  | IfExpr(_,e1,e2,e3) ->
+     if (to_bool (eval_expr e1)) then
+       NumVal(to_num (eval_expr e2))
+     else
+       NumVal(to_num (eval_expr e3))
+     
   (* other expression types unimplemented *)
   | _ -> raise (UnimplementedExpr(e))
 
