@@ -127,12 +127,31 @@ let parser_tests =
                                                       ValExpr(NoPos, NumVal(1.0)))),
                                       DivBop,
                                       ValExpr(NoPos, NumVal(5.0)))))));
-                           
-                           
-
-
-      
-      
-      
+        (Some("Boolean expression"),
+        "a > b",
+        Ok(ExprProgram(NoPos,
+                      BopExpr(NoPos, 
+                              VarExpr(NoPos, "a"), 
+                              GtBop,
+                              VarExpr(NoPos, "b")))));                         
+        (Some("Complex Boolean expression"),
+        "a < b || c >= d",
+        Ok(ExprProgram(NoPos,
+                      BopExpr(NoPos,
+                             BopExpr(NoPos,
+                                    VarExpr(NoPos, "a"),
+                                    LtBop,
+                                    VarExpr(NoPos, "b")),
+                             OrBop,
+                             BopExpr(NoPos,
+                                    VarExpr(NoPos, "c"),
+                                    GteBop,
+                                    VarExpr(NoPos, "d"))))));
+        (Some("Return expression"),
+        "{ return hello ; }",
+        Ok(ExprProgram(NoPos,
+                      BlockExpr(NoPos,
+                               ReturnBlock(NoPos, 
+                                          VarExpr(NoPos, "hello"))))));
 
   ])
