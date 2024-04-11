@@ -78,9 +78,16 @@ and eval_expr (e:expr_t) : value_t =  match e with
      BoolVal(to_num (eval_expr e1) > to_num (eval_expr e2))
   | BopExpr(_,e1,GteBop,e2) ->
      BoolVal(to_num (eval_expr e1) >= to_num (eval_expr e2))
-  (* Need to expand this to choose between bool && and float/int && *)
+  (* Have to handle weird javascript rules - nonzero numbers are true *)
+  (* See slide 20 of L17-semantics-activity-postlecture.pdf for explanation*)
   | BopExpr(_,e1,AndBop,e2) ->
-     BoolVal(to_bool (eval_expr e1) && to_bool (eval_expr e2))
+     (match (to_bool (eval_expr e1), eval_expr e2) with
+      | (true, v2) ->  eval_expr e2
+      | (false, v2) -> eval_expr e1)
+  | BopExpr(_,e1,OrBop,e2) ->
+     (match (to_bool (eval_expr e1), eval_expr e2) with
+      | (true, v2) -> eval_expr e1 
+      | (false, v2) -> eval_expr e2)
   (* Task 2: console.log *)
   | PrintExpr(_,e) ->
      print_string ( to_str (eval_expr e));
@@ -91,7 +98,6 @@ and eval_expr (e:expr_t) : value_t =  match e with
        NumVal(to_num (eval_expr e2))
      else
        NumVal(to_num (eval_expr e3))
-     
   (* other expression types unimplemented *)
   | _ -> raise (UnimplementedExpr(e))
 
@@ -165,4 +171,6 @@ let str_eval_tests =
   test_group "String Evaluation"
     [
       (* TODO *)
+      (None, "\"abc\"||123", Ok(StrVal("abc")));
+      (None, "\"\" || 123", Ok(NumVal(123.0)));
     ]
