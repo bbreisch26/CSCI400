@@ -189,4 +189,15 @@ let parser_tests =
                                 VarExpr(NoPos, "x"),
                                 VarExpr(NoPos, "y")),
                       ExprProgram(NoPos, ValExpr(NoPos, UndefVal)))));
+        (Some("Function expression"),
+        "function f(x) { return hello; }",
+        Ok(ExprProgram(NoPos,
+                      FuncExpr(NoPos, 
+                              (Some("f"), [("x", None)], ReturnBlock(NoPos, 
+                                                                  VarExpr(NoPos, "hello")), None)))));
+        (Some("Field List expression"),
+        "{a:int, b:char, c:string}",
+        Ok(ExprProgram(NoPos,
+                      ObjectExpr(NoPos,
+                                ("a", VarExpr(NoPos, "int"))::("b", VarExpr(NoPos, "char"))::("c", VarExpr(NoPos, "string"))::[]))));
   ])
