@@ -200,4 +200,27 @@ let parser_tests =
         Ok(ExprProgram(NoPos,
                       ObjectExpr(NoPos,
                                 ("a", VarExpr(NoPos, "int"))::("b", VarExpr(NoPos, "char"))::("c", VarExpr(NoPos, "string"))::[]))));
+        (Some("Precedence of and and or"),
+        "true || false && true",
+        Ok(ExprProgram(NoPos, 
+                      BopExpr(NoPos,
+                             ValExpr(NoPos, BoolVal(true)),
+                             OrBop,
+                             BopExpr(NoPos,
+                                    ValExpr(NoPos, BoolVal(false)),
+                                    AndBop,
+                                    ValExpr(NoPos, BoolVal(true)))))));
+        (Some("Precedence of Arithmatic operators"),
+        "1 * 2 + 3 / 4",
+        Ok(ExprProgram(NoPos,
+                      BopExpr(NoPos,
+                             BopExpr(NoPos,
+                                    ValExpr(NoPos, NumVal(1.0)),
+                                    TimesBop,
+                                    ValExpr(NoPos, NumVal(2.0))),
+                             PlusBop,
+                             BopExpr(NoPos,
+                                    ValExpr(NoPos, NumVal(3.0)),
+                                    DivBop,
+                                    ValExpr(NoPos, NumVal(4.0))))))); 
   ])
