@@ -56,18 +56,19 @@
 
 /* starting with lowest precedence: */
 /* DONE: fix associativity and precedence */
-%nonassoc COLON_OP
-%nonassoc COND_OP
-%left LOG_OR_OP
-%left LOG_AND_OP
-%left STREQ_OP NSTREQ_OP
-%left LEQ_OP LT_OP GEQ_OP GT_OP
-%nonassoc LOG_NOT_OP
-%left DOT_OP
-%nonassoc LP_KW
-/*Added here, * and / are above + and -*/
-%nonassoc ADD_OP SUB_OP
-%nonassoc MUL_OP DIV_OP
+/* see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table */
+%nonassoc COLON_OP SEMICOLON_OP /* Not sure where colon, semicolon fall on this list*/
+%left COMMA_OP /* 1 */
+%right ASSIGN_OP COND_OP /* 2 */
+%left LOG_OR_OP /* 3 */
+%left LOG_AND_OP /* 4 */
+%left STREQ_OP NSTREQ_OP EQ_OP NEQ_OP /* 8 */
+%left LEQ_OP LT_OP GEQ_OP GT_OP /* 9 */
+%left ADD_OP SUB_OP /* 11 */
+%left MUL_OP DIV_OP /* 12 */
+%nonassoc LOG_NOT_OP /* 14 */
+%left DOT_OP /* 17 */
+%nonassoc LP_KW /* 18 */
 /*(* ^^ highest precedence / tightest binding *)*/
 
 %start start /*(* the entry point *)*/

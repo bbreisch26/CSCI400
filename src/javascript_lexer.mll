@@ -94,7 +94,7 @@ rule token = parse
   (* - floating point: e.g., 123., 123.456, .123 *)
   | ['0'-'9']* '.' ['0'-'9']*
   (* - scientific notation: e.g., 123e5, 123.E5, 123.456e-5, .123e100 *)
-  | ['0'-'9']* exponent
+  | ['0'-'9']* '.'? ['0'-'9']* exponent
    as x {NUMBER(js_float_of_string x )}
 
   (* End Numbers  *)

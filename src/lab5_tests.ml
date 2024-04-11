@@ -17,7 +17,7 @@ let lexer_tests =
      (Some("simple js"),
       "1 + 2",
       Ok([NUMBER(1.0); ADD_OP; NUMBER(2.0); EOF]));
-     (* TODO *)
+     (* Done *)
      (Some("Simple binary"),
       "0b111 + 0B0001",
       Ok([NUMBER(7.0); ADD_OP; NUMBER(1.0); EOF]));
@@ -28,8 +28,11 @@ let lexer_tests =
       "0x1337 * 0XCafEBabE",
       Ok([NUMBER(4919.0); MUL_OP; NUMBER(3405691582.0); EOF]));
      (Some("Simple float"),
-      "123.0 - .123",
-      Ok([NUMBER(123.0); SUB_OP; NUMBER(0.123); EOF]));
+      "123.0 - .123 + 123.456",
+      Ok([NUMBER(123.0); SUB_OP; NUMBER(0.123); ADD_OP; NUMBER(123.456); EOF]));
+     (Some("Simple sci notation"),
+      "123e0 + 123.E5 + 123.456e-5 + .123e1",
+      Ok([NUMBER(123.0); ADD_OP; NUMBER(12300000.0); ADD_OP; NUMBER(0.00123456); ADD_OP; NUMBER(1.23); EOF]));
 
     (Some("floating point equation"),
       "(123.0 - .123) * (5.0 + 1.2)",
@@ -152,6 +155,18 @@ let parser_tests =
         Ok(ExprProgram(NoPos,
                       BlockExpr(NoPos,
                                ReturnBlock(NoPos, 
-                                          VarExpr(NoPos, "hello"))))));
+                                           VarExpr(NoPos, "hello"))))));
+        (Some("Precedence Test"),
+         "!((3 === 3)===true)",
+         Ok(ExprProgram(NoPos,
+                        UopExpr(NoPos,
+                                 NotUop,
+                                 BopExpr(NoPos,
+                                           BopExpr(NoPos,
+                                                   ValExpr(NoPos, NumVal(3.0)),
+                                                   EqBop,
+                                                   ValExpr(NoPos, NumVal(3.0))),
+                                           EqBop,
+                                           ValExpr(NoPos, BoolVal(true)))))));
 
   ])
