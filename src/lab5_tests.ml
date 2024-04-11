@@ -168,5 +168,25 @@ let parser_tests =
                                                    ValExpr(NoPos, NumVal(3.0))),
                                            EqBop,
                                            ValExpr(NoPos, BoolVal(true)))))));
-
+        (Some("Console Log expression"),
+        "console.log(HelloWorld)",
+        Ok(ExprProgram(NoPos,
+                      PrintExpr(NoPos, 
+                               VarExpr(NoPos, 
+                                      "HelloWorld")))));
+        (Some("Const assignment expression"),
+        "const x = 10;",
+        Ok(StmtProgram(NoPos,
+                      ConstStmt(NoPos, 
+                               "x",
+                               ValExpr(NoPos, 
+                                      NumVal(10.0))),
+                      ExprProgram(NoPos, ValExpr(NoPos, UndefVal)))));
+        (Some("Assignment Expression"),
+        "x = y;",
+        Ok(StmtProgram(NoPos,
+                      AssignStmt(NoPos,
+                                VarExpr(NoPos, "x"),
+                                VarExpr(NoPos, "y")),
+                      ExprProgram(NoPos, ValExpr(NoPos, UndefVal)))));
   ])
