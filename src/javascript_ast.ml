@@ -277,7 +277,7 @@ and str_value_helper (v : value_t) (print_special : bool) = match v with
   | StrVal(s) -> Printf.sprintf "\"%s\"" s
   | UndefVal -> "undefined"
   | ClosureVal(nm,f) ->
-    if print_special then Printf.sprintf "CL<%s; %s>" (str_name_map nm) (str_lambda f)
+    if print_special then Printf.sprintf "CL<%s; %s>" (str_environment nm) (str_lambda f)
     else str_lambda f
   | RefVal(addr) -> Printf.sprintf "REF<%d>" addr
 
@@ -293,13 +293,12 @@ and str_typed_var (tv : typed_ident_t) = match tv with
 
 and str_ident (x : ident_t) = x
 
-and str_name_map nm =
-  (* TODO: combine with str_environment *)
+and str_environment (e:environment_t) =
   "{" ^
     (str_x_list
        (fun (k,(m,v)) ->
          Printf.sprintf "%s->(%s,%s)" k (str_access m) (str_value_helper v true))
-       (StringMap.bindings nm) ", ")
+       (StringMap.bindings e) ", ")
     ^ "}"
 
 let str_ast a = match a with
