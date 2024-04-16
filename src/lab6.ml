@@ -130,9 +130,9 @@ and eval_expr (e:expr_t) : value_t =  match e with
   (* Task 3: conditional *)
   | IfExpr(_,e1,e2,e3) ->
      if (to_bool (eval_expr e1)) then
-       NumVal(to_num (eval_expr e2))
+       eval_expr e2
      else
-       NumVal(to_num (eval_expr e3))
+       eval_expr e3
   (*Task 4: String*)
   
   (* other expression types unimplemented *)
@@ -202,6 +202,12 @@ let cond_eval_tests =
   test_group "Conditional Evaluation"
     [
       (* TODO *)
+      (None, "(true === 1) ? 123 : 321", Ok(NumVal(123.0)));
+      (None, "false ? 123 : (2 > 1)", Ok(BoolVal(true)));
+      (None, "true ? \"a\" : 123", Ok(StrVal("a")));
+      (* Test string eval to bool*)
+      (None, "\"a\" ? true : 400", Ok(BoolVal(true)));
+      (None, "\"a\"-\"a\" ? true : 400", Ok(NumVal(400.0)));
     ]
 
 let str_eval_tests =
