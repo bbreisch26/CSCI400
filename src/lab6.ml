@@ -125,7 +125,7 @@ and eval_expr (e:expr_t) : value_t =  match e with
       | (false, v2) -> eval_expr e2)
   (* Task 2: console.log *)
   | PrintExpr(_,e) ->
-     print_string ( to_str (eval_expr e));
+     print_endline ( to_str (eval_expr e));
      UndefVal
   (* Task 3: conditional *)
   | IfExpr(_,e1,e2,e3) ->
