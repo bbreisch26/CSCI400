@@ -220,4 +220,10 @@ let str_eval_tests =
       (None, "\"aaaa\" > \"aaa\"",          Ok(BoolVal(true))); (*This is new*)
       (None, "\"aaa\" <= \"aaaa\"",          Ok(BoolVal(true))); (*This is new*)
       (None, "\"aaa\" >= \"aaaa\"",          Ok(BoolVal(false))); (*This is new*)
+      (None, "0x123 + \"abc\"", Ok(StrVal("291abc"))); (* Test num concat string *)
+      (None, "true + \"abc\"", Ok(StrVal("trueabc"))); (* Test bool concat string *)
+      (None, "\"abc\" + \"123\"", Ok(StrVal("abc123"))); (* Test string concat string *)
+      (None, "\"Longstring\" > true", Ok(BoolVal(false)));
+      (None, "\"abc\" > true", Ok(BoolVal(false)));
+      (None, "true > \"abc\"", Ok(BoolVal(false)));
     ]
