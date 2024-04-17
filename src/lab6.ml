@@ -61,13 +61,11 @@ and eval_expr (e:expr_t) : value_t =  match e with
   (* Binary operators *)
   | BopExpr(_,e1,PlusBop,e2) ->
     (let eval_e1 = eval_expr e1 in
-      match eval_e1 with
-        | StrVal(_) -> StrVal(to_str(eval_expr e1) ^ to_str(eval_expr e2))
-        | _ ->
-          (let eval_e2 = eval_expr e2 in
-            match eval_e2 with
-            | StrVal(_) -> StrVal(to_str(eval_expr e1) ^ to_str(eval_expr e2))
-            | _ -> NumVal(to_num (eval_expr e1) +. to_num (eval_expr e2))))
+     let eval_e2 = eval_expr e2 in
+     match (eval_e1, eval_e2) with
+     | (StrVal(_), _)
+     | (_, StrVal(_)) -> StrVal(to_str eval_e1 ^ to_str eval_e2)
+     | _ -> NumVal(to_num eval_e1 +. to_num eval_e2))
   | BopExpr(_,e1,TimesBop,e2) ->
      NumVal(to_num (eval_expr e1) *. to_num (eval_expr e2))
   | BopExpr(_,e1,DivBop,e2) ->
@@ -78,41 +76,29 @@ and eval_expr (e:expr_t) : value_t =  match e with
   | BopExpr(_,e1,NeqBop,e2) ->
      BoolVal(to_num (eval_expr e1) <> to_num (eval_expr e2))
   | BopExpr(_,e1,LtBop,e2) ->
-    (let eval_e1 = eval_expr e1 in
-      match eval_e1 with
-        | StrVal(_) -> BoolVal(to_str(eval_expr e1) < to_str(eval_expr e2))
-        | _ ->
-          (let eval_e2 = eval_expr e2 in
-            match eval_e2 with
-            | StrVal(_) -> BoolVal(to_str(eval_expr e1) < to_str(eval_expr e2))
-            | _ -> BoolVal(to_num (eval_expr e1) < to_num (eval_expr e2))))
+     (let eval_e1 = eval_expr e1 in
+     let eval_e2 = eval_expr e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_),StrVal(_)) -> BoolVal(eval_e1 < eval_e2) (* len comparison only used in JS when both operands are strings *)
+      | _ -> BoolVal(to_num eval_e1 < to_num eval_e2))
   | BopExpr(_,e1,LteBop,e2) ->
     (let eval_e1 = eval_expr e1 in
-      match eval_e1 with
-        | StrVal(_) -> BoolVal(to_str(eval_expr e1) <= to_str(eval_expr e2))
-        | _ ->
-          (let eval_e2 = eval_expr e2 in
-            match eval_e2 with
-            | StrVal(_) -> BoolVal(to_str(eval_expr e1) <= to_str(eval_expr e2))
-            | _ -> BoolVal(to_num (eval_expr e1) <= to_num (eval_expr e2))))
+     let eval_e2 = eval_expr e2 in
+     match (eval_e1, eval_e2) with
+     | (StrVal(_), StrVal(_)) -> BoolVal(eval_e1 <= eval_e2)
+     | _ -> BoolVal(to_num eval_e1 < to_num eval_e2))
   | BopExpr(_,e1,GtBop,e2) ->
     (let eval_e1 = eval_expr e1 in
-      match eval_e1 with
-        | StrVal(_) -> BoolVal(to_str(eval_expr e1) > to_str(eval_expr e2))
-        | _ ->
-          (let eval_e2 = eval_expr e2 in
-            match eval_e2 with
-            | StrVal(_) -> BoolVal(to_str(eval_expr e1) > to_str(eval_expr e2))
-            | _ -> BoolVal(to_num (eval_expr e1) > to_num (eval_expr e2))))
-  | BopExpr(_,e1,GteBop,e2) ->
+     let eval_e2 = eval_expr e2 in
+     match (eval_e1, eval_e2) with
+     | (StrVal(_), StrVal(_)) -> BoolVal(eval_e1 > eval_e2)
+     | _ -> BoolVal(to_num eval_e1 > to_num eval_e2))
+   | BopExpr(_,e1,GteBop,e2) ->
     (let eval_e1 = eval_expr e1 in
-      match eval_e1 with
-        | StrVal(_) -> BoolVal(to_str(eval_expr e1) >= to_str(eval_expr e2))
-        | _ ->
-          (let eval_e2 = eval_expr e2 in
-            match eval_e2 with
-            | StrVal(_) -> BoolVal(to_str(eval_expr e1) >= to_str(eval_expr e2))
-            | _ -> BoolVal(to_num (eval_expr e1) >= to_num (eval_expr e2))))
+     let eval_e2 = eval_expr e2 in
+     match (eval_e1, eval_e2) with
+     | (StrVal(_), StrVal(_)) -> BoolVal(eval_e1 >= eval_e2)
+     | _ -> BoolVal(to_num eval_e1 >= to_num eval_e2))
   (* Have to handle weird javascript rules - nonzero numbers are true *)
   (* See slide 20 of L17-semantics-activity-postlecture.pdf for explanation*)
   | BopExpr(_,e1,AndBop,e2) ->
