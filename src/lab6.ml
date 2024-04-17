@@ -101,7 +101,7 @@ and eval_expr (e:expr_t) : value_t =  match e with
      let eval_e2 = eval_expr e2 in
      match (eval_e1, eval_e2) with
      | (StrVal(_), StrVal(_)) -> BoolVal(eval_e1 <= eval_e2)
-     | _ -> BoolVal(to_num eval_e1 < to_num eval_e2))
+     | _ -> BoolVal(to_num eval_e1 <= to_num eval_e2))
   | BopExpr(_,e1,GtBop,e2) ->
     (let eval_e1 = eval_expr e1 in
      let eval_e2 = eval_expr e2 in
