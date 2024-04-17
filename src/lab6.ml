@@ -245,19 +245,78 @@ let cond_eval_tests =
 let str_eval_tests =
   test_group "String Evaluation"
     [
-      (* TODO *)
+      (* || tests *)
       (None, "\"abc\"||123", Ok(StrVal("abc")));
       (None, "\"\" || 123", Ok(NumVal(123.0)));
+
+      (* > tests*)
        (None, "\"aaa\" > \"aaaa\"",          Ok(BoolVal(false))); (*This is new*)
       (None, "\"aaaa\" > \"aaa\"",          Ok(BoolVal(true))); (*This is new*)
+
+      (* <= tests *)
       (None, "\"aaa\" <= \"aaaa\"",          Ok(BoolVal(true))); (*This is new*)
+      (None, "\"a\" <= \"b\"",          Ok(BoolVal(true)));
+      (None, "\"a\" <= \"a\"",          Ok(BoolVal(true)));
+      (None, "\"a\" <= \"3\"",          Ok(BoolVal(false)));
+
+      (* >= tests *)
       (None, "\"aaa\" >= \"aaaa\"",          Ok(BoolVal(false))); (*This is new*)
+      (None, "\"a\" >= \"b\"",          Ok(BoolVal(false)));
+      (None, "\"a\" >= \"a\"",          Ok(BoolVal(true)));
+      (None, "\"a\" >= \"3\"",          Ok(BoolVal(true)));
+
+      (* + tests *)
       (None, "0x123 + \"abc\"", Ok(StrVal("291abc"))); (* Test num concat string *)
       (None, "true + \"abc\"", Ok(StrVal("trueabc"))); (* Test bool concat string *)
       (None, "\"abc\" + \"123\"", Ok(StrVal("abc123"))); (* Test string concat string *)
+
+      (* > tests*)
       (None, "\"Longstring\" > true", Ok(BoolVal(false)));
       (None, "\"abc\" > true", Ok(BoolVal(false)));
       (None, "true > \"abc\"", Ok(BoolVal(false)));
+      
+      (* && tests *)
+      (None, "\"\" && \"foo\"", Ok(StrVal("")));
+      (None, "\"\" && \"foo\"", Ok(StrVal("")));
+      (None, "\"foo\" && 4", Ok(NumVal(4.0)));
+      (None, "\"Cat\" && \"Dog\"", Ok(StrVal("Dog")));
+      (None, "\"\" && false", Ok(StrVal("")));
+      (None, "false && \"\"", Ok(BoolVal(false)));
+
+      (* ! tests *)
+      (None, "!\"\"", Ok(BoolVal(true)));
+      (None, "!!\"\"", Ok(BoolVal(false)));
+      (None, "!\"Cat\"", Ok(BoolVal(false)));
+
+      (* - tests *)
+      (None, "\"foo\" - 3", Ok(NumVal(nan)));
+      (None, "5 - \"3\"", Ok(NumVal(2.0)));
+
+      (* * tests *)
+      (None, "\"foo\" * 2", Ok(NumVal(nan)));
+      (None, "\"2\" * 2", Ok(NumVal(4.0)));
+
+      (* / tests*)
+      (None, "\"4\" / 2", Ok(NumVal(2.0)));
+      (None, "\"4\" / \"2\"", Ok(NumVal(2.0)));
+      (None, "\"foo\" / \"bar\"", Ok(NumVal(nan)));
+
+      (* === tests*)
       (None, "\"abc\" === \"abc\"", Ok(BoolVal(true)));
+      (None, "\"true\" === \"true\"", Ok(BoolVal(true)));
+      (None, "\"true\" === true", Ok(BoolVal(false)));
+      (None, "\"3\" === 3", Ok(BoolVal(false)));
+
+      (* !== tests*)
       (None, "\"abc\" !== \"abc\"", Ok(BoolVal(false)));
+      (None, "3 !== \"3\"", Ok(BoolVal(true)));
+      (None, "\"3\" !== \"3\"", Ok(BoolVal(false)));
+
+      (* < tests*)
+      (None, "\"a\" < \"b\"", Ok(BoolVal(true)));
+      (None, "\"a\" < \"a\"", Ok(BoolVal(false)));
+      (None, "\"a\" < \"3\"", Ok(BoolVal(false)));
+      (None, "\"5\" < 3", Ok(BoolVal(false)));
+      (None, "\"hello\" < 5", Ok(BoolVal(false)));
+    
     ]    
