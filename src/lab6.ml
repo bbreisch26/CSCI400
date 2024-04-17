@@ -71,10 +71,25 @@ and eval_expr (e:expr_t) : value_t =  match e with
   | BopExpr(_,e1,DivBop,e2) ->
      NumVal(to_num (eval_expr e1) /. to_num (eval_expr e2))
   (* Boolean expressions *)
+  (* Strict inequality - differing types always return false *)
+  (* See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality *)
   | BopExpr(_,e1,EqBop,e2) ->
-     BoolVal(to_num (eval_expr e1) = to_num (eval_expr e2))
+     (let eval_e1 = eval_expr e1 in
+      let eval_e2 = eval_expr e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_), StrVal(_))
+      | (NumVal(_), NumVal(_))
+      | (BoolVal(_), BoolVal(_)) -> BoolVal(eval_e1 = eval_e2)
+      | _ -> BoolVal(false)) (* Types must be different in this case - false *)
+  (* Strict inequality always returns true with differing types *)
   | BopExpr(_,e1,NeqBop,e2) ->
-     BoolVal(to_num (eval_expr e1) <> to_num (eval_expr e2))
+     (let eval_e1 = eval_expr e1 in
+      let eval_e2 = eval_expr e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_), StrVal(_))
+      | (NumVal(_), NumVal(_))
+      | (BoolVal(_), BoolVal(_)) -> BoolVal(eval_e1 <> eval_e2)
+      | _ -> BoolVal(true)) (* Types must be different in this case - !false = true *)
   | BopExpr(_,e1,LtBop,e2) ->
      (let eval_e1 = eval_expr e1 in
      let eval_e2 = eval_expr e2 in
@@ -188,7 +203,7 @@ let cond_eval_tests =
   test_group "Conditional Evaluation"
     [
       (* TODO *)
-      (None, "(true === 1) ? 123 : 321", Ok(NumVal(123.0)));
+      (None, "(true === true) ? 123 : 321", Ok(NumVal(123.0)));
       (None, "false ? 123 : (2 > 1)", Ok(BoolVal(true)));
       (None, "true ? \"a\" : 123", Ok(StrVal("a")));
       (* Test string eval to bool*)
@@ -212,4 +227,6 @@ let str_eval_tests =
       (None, "\"Longstring\" > true", Ok(BoolVal(false)));
       (None, "\"abc\" > true", Ok(BoolVal(false)));
       (None, "true > \"abc\"", Ok(BoolVal(false)));
-    ]
+      (None, "\"abc\" === \"abc\"", Ok(BoolVal(true)));
+      (None, "\"abc\" !== \"abc\"", Ok(BoolVal(false)));
+    ]    
