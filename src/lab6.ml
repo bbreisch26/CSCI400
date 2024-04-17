@@ -217,6 +217,8 @@ let eval_tests =
       (None, "true || false && false", Ok(BoolVal(true)));
       (None, "true && (false || false)", Ok(BoolVal(false)));
       (None, "(2 === 6) || (2 < 0) && (3 === 3)", Ok(BoolVal(false)));
+      (None, "50 - 10 / 10", Ok(NumVal(49.0)));
+      (None, "50 + 5 * 2", Ok(NumVal(60.0)));
       (*More add and or tests*)
       (None, "true && 100", Ok(NumVal(100.0)));
       (None, "100 && true", Ok(BoolVal(true)));
