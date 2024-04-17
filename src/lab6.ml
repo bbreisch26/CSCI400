@@ -197,6 +197,35 @@ let eval_tests =
   test_group "Evaluator"
     [
       (* TODO *)
+      (*Simple tests for binary operators*)
+      (None, "55 + 45", Ok(NumVal(100.0)));
+      (None, "55 - false", Ok(NumVal(55.0)));
+      (None, "50 * true", Ok(NumVal(50.0)));
+      (None, "50 / 10", Ok(NumVal(5.0)));
+      (None, "50 === 50", Ok(BoolVal(true)));
+      (None, "50 !== 50", Ok(BoolVal(false)));
+      (None, "45 < 55", Ok(BoolVal(true)));
+      (None, "45 > 55", Ok(BoolVal(false)));
+      (None, "55 <= 55", Ok(BoolVal(true)));
+      (None, "55 >= 55", Ok(BoolVal(true)));
+      (None, "100 || true", Ok(NumVal(100.0)));
+      (None, "true && 0", Ok(NumVal(0.0)));
+      (*Simple tests for unary operators*)
+      (None, "-55", Ok(NumVal(-55.0)));
+      (None, "!true", Ok(BoolVal(false)));
+      (*Precedence tests*)
+      (None, "true || false && false", Ok(BoolVal(true)));
+      (None, "true && (false || false)", Ok(BoolVal(false)));
+      (None, "(2 === 6) || (2 < 0) && (3 === 3)", Ok(BoolVal(false)));
+      (*More add and or tests*)
+      (None, "true && 100", Ok(NumVal(100.0)));
+      (None, "100 && true", Ok(BoolVal(true)));
+      (None, "0 && false", Ok(NumVal(0.0)));
+      (None, "false && 0", Ok(BoolVal(false)));
+      (None, "true || 100", Ok(BoolVal(true)));
+      (None, "100 || true", Ok(NumVal(100.0)));
+      (None, "0 || false", Ok(BoolVal(false)));
+      (None, "false || 0", Ok(NumVal(0.0)));
     ]
 
 let cond_eval_tests =
