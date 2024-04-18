@@ -18,7 +18,7 @@ jobs:
       run: sudo apt install ocaml
 
     - name: Compile Lab
-      run: make lab6
+      run: make lab7
       
     - name: Test Lab
       run: ./ci-test.sh

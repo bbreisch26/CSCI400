@@ -1,13 +1,13 @@
 #! /bin/bash
 
 
-result=$(make lab6_test)
+result=$(make lab7_test)
 if echo $result | grep -q "FAIL"; then
 	echo "$result"
-	echo "Lab6 failed some tests, check output"
+	echo "Lab7 failed some tests, check output"
 	(exit 1)
 else
 	echo "$result"
-	echo "Lab6 passed tests!"
+	echo "Lab7 passed tests!"
 	(exit 0)
 fi
