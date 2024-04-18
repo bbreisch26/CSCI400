@@ -41,12 +41,16 @@ and eval_stmt (env:environment_t) (s:stmt_t) : environment_t = match s with
   (* TODO *) (* Ensure Mutable/Immutable is correct *)
   | ConstStmt(_,id, e1) ->
      bind_environment env id Immutable (eval_expr env e1)
-  | LetStmt(_,id,e1) ->
+ (* | LetStmt(_,id,e1) ->
      bind_environment env id Mutable (eval_expr env e1)
   | AssignStmt(_,e1,e2) ->
-     bind_environment env (to_str (eval_expr env e1)) Mutable (eval_expr env e2)
+     bind_environment env (to_str (eval_expr env e1)) Mutable (eval_expr env e2) *)
   | _ -> raise (UnimplementedStmt(s))
 
+and eval_args (env:environment_t) (names: typed_ident_t list) (vals: expr_t list) =
+  match (names, vals) with
+  | (((fn,_)::rn),(fv::rv)) -> eval_args (bind_environment env fn Immutable (eval_expr env fv)) rn rv
+  | _ -> env
 (* evaluate a value *)
 and eval_expr (env:environment_t) (e:expr_t) : value_t =
   (*Printf.printf "%s %s\n" (str_expr e) (str_environment_simple env);*)
@@ -56,20 +60,25 @@ and eval_expr (env:environment_t) (e:expr_t) : value_t =
      NumVal(to_num (eval_expr env e1) -. to_num (eval_expr env e2))
   (* TODO *)
 
-  | VarExpr(p, i) -> (
-    match (read_environment env i) with
+  | VarExpr(p, name) -> (
+    match read_environment env name with
     | Some(_, value) -> value
-    | None -> raise (UndeclaredVar(i))
+    | None -> raise (UndeclaredVar(name))
     )
   | ValExpr(p,v) -> v
   (* and lambda_t = (ident_t option * typed_ident_t list * block_t * typ_t option)*)
   | FuncExpr(p,l) -> (*ClosureVal(env, l)*)
     (
     match l with
-    | (Some (v), params, block, None) -> ClosureVal((bind_environment env v Mutable (ClosureVal(env, l))), l)
+    | (Some(name), params, block, None) -> ClosureVal(env, l)
     | (None, params, block, None) -> ClosureVal(env, l)
     )
-  
+  | CallExpr(p, name, vals) ->
+     (match eval_expr env name with
+      | ClosureVal(insideEnv,l) ->
+         (match (l) with
+          | (_, args, block, None) -> (eval_block (eval_args insideEnv args vals)  block))
+      | _ -> raise(InvalidCall(name)))
 
 
   (* lab 6 code: *)
