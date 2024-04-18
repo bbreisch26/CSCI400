@@ -25,7 +25,9 @@ open Util
 (* evaluate a program *)
 let rec eval (env : environment_t) (p: program_t) : value_t = match p with
   | ExprProgram(_,e) -> eval_expr env e
-  (* TODO *)
+  (* DONE *)
+  | StmtProgram(_,s,p1) -> (* Bind statement to environment and evaluate e *)
+     eval (eval_stmt env s) p1
   | _ -> raise (UnimplementedProgram(p))
 
 (* evaluate a block *)
@@ -36,7 +38,13 @@ and eval_block (env:environment_t) (p:block_t) : value_t = match p with
 
 (* evaluate a statement *)
 and eval_stmt (env:environment_t) (s:stmt_t) : environment_t = match s with
-  (* TODO *)
+  (* TODO *) (* Ensure Mutable/Immutable is correct *)
+  | ConstStmt(_,id, e1) ->
+     bind_environment env id Immutable (eval_expr env e1)
+  | LetStmt(_,id,e1) ->
+     bind_environment env id Mutable (eval_expr env e1)
+  | AssignStmt(_,e1,e2) ->
+     bind_environment env (to_str (eval_expr env e1)) Mutable (eval_expr env e2)
   | _ -> raise (UnimplementedStmt(s))
 
 (* evaluate a value *)
