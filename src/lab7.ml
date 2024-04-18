@@ -62,6 +62,16 @@ and eval_expr (env:environment_t) (e:expr_t) : value_t =
     | None -> raise (UndeclaredVar(i))
     )
   | ValExpr(p,v) -> v
+  (* and lambda_t = (ident_t option * typed_ident_t list * block_t * typ_t option)*)
+  | FuncExpr(p,l) -> (*ClosureVal(env, l)*)
+    (
+    match l with
+    | (Some (v), params, block, None) -> ClosureVal((bind_environment env v Mutable (ClosureVal(env, l))), l)
+    | (None, params, block, None) -> ClosureVal(env, l)
+    )
+  
+
+
   (* lab 6 code: *)
   | UopExpr(_,NotUop,e1) ->
     BoolVal(not (to_bool (eval_expr env e1)))
