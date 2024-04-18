@@ -47,6 +47,99 @@ and eval_expr (env:environment_t) (e:expr_t) : value_t =
   | BopExpr(_,e1,MinusBop,e2) ->
      NumVal(to_num (eval_expr env e1) -. to_num (eval_expr env e2))
   (* TODO *)
+
+  | VarExpr(p, i) -> (
+    match (read_environment env i) with
+    | Some(_, value) -> value
+    | None -> raise (UndeclaredVar(i))
+    )
+  | ValExpr(p,v) -> v
+  (* lab 6 code: *)
+  | UopExpr(_,NotUop,e1) ->
+    BoolVal(not (to_bool (eval_expr env e1)))
+  | UopExpr(_,NegUop,e1) ->
+      NumVal(-. (to_num (eval_expr env e1)))
+  | UopExpr(_,PosUop,e1) ->
+      NumVal(+. (to_num (eval_expr env e1)))
+  (* Binary operators *)
+  | BopExpr(_,e1,PlusBop,e2) ->
+    (let eval_e1 = eval_expr env e1 in
+      let eval_e2 = eval_expr env e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_), _)
+      | (_, StrVal(_)) -> StrVal(to_str eval_e1 ^ to_str eval_e2)
+      | _ -> NumVal(to_num eval_e1 +. to_num eval_e2))
+  | BopExpr(_,e1,TimesBop,e2) ->
+      NumVal(to_num (eval_expr env e1) *. to_num (eval_expr env e2))
+  | BopExpr(_,e1,DivBop,e2) ->
+      NumVal(to_num (eval_expr env e1) /. to_num (eval_expr env e2))
+  (* Boolean expressions *)
+  (* Strict inequality - differing types always return false *)
+  (* See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality *)
+  | BopExpr(_,e1,EqBop,e2) ->
+      (let eval_e1 = eval_expr env e1 in
+      let eval_e2 = eval_expr env e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_), StrVal(_))
+      | (NumVal(_), NumVal(_))
+      | (BoolVal(_), BoolVal(_)) -> BoolVal(eval_e1 = eval_e2)
+      | _ -> BoolVal(false)) (* Types must be different in this case - false *)
+  (* Strict inequality always returns true with differing types *)
+  | BopExpr(_,e1,NeqBop,e2) ->
+      (let eval_e1 = eval_expr env e1 in
+      let eval_e2 = eval_expr env e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_), StrVal(_))
+      | (NumVal(_), NumVal(_))
+      | (BoolVal(_), BoolVal(_)) -> BoolVal(eval_e1 <> eval_e2)
+      | _ -> BoolVal(true)) (* Types must be different in this case - !false = true *)
+  | BopExpr(_,e1,LtBop,e2) ->
+      (let eval_e1 = eval_expr env e1 in
+      let eval_e2 = eval_expr env e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_),StrVal(_)) -> BoolVal(eval_e1 < eval_e2) (* len comparison only used in JS when both operands are strings *)
+      | _ -> BoolVal(to_num eval_e1 < to_num eval_e2))
+  | BopExpr(_,e1,LteBop,e2) ->
+    (let eval_e1 = eval_expr env e1 in
+      let eval_e2 = eval_expr env e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_), StrVal(_)) -> BoolVal(eval_e1 <= eval_e2)
+      | _ -> BoolVal(to_num eval_e1 <= to_num eval_e2))
+  | BopExpr(_,e1,GtBop,e2) ->
+    (let eval_e1 = eval_expr env e1 in
+      let eval_e2 = eval_expr env e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_), StrVal(_)) -> BoolVal(eval_e1 > eval_e2)
+      | _ -> BoolVal(to_num eval_e1 > to_num eval_e2))
+    | BopExpr(_,e1,GteBop,e2) ->
+    (let eval_e1 = eval_expr env e1 in
+      let eval_e2 = eval_expr env e2 in
+      match (eval_e1, eval_e2) with
+      | (StrVal(_), StrVal(_)) -> BoolVal(eval_e1 >= eval_e2)
+      | _ -> BoolVal(to_num eval_e1 >= to_num eval_e2))
+  (* Have to handle weird javascript rules - nonzero numbers are true *)
+  (* See slide 20 of L17-semantics-activity-postlecture.pdf for explanation*)
+  | BopExpr(_,e1,AndBop,e2) ->
+      (match (to_bool (eval_expr env e1), eval_expr env e2) with
+      | (true, v2) ->  eval_expr env e2
+      | (false, v2) -> eval_expr env e1)
+  | BopExpr(_,e1,OrBop,e2) ->
+      (match (to_bool (eval_expr env e1), eval_expr env e2) with
+      | (true, v2) -> eval_expr env e1 
+      | (false, v2) -> eval_expr env e2)
+  (* Task 2: console.log *)
+  | PrintExpr(_,e) ->
+      print_endline ( to_str (eval_expr env e));
+      UndefVal
+  (* Task 3: conditional *)
+  | IfExpr(_,e1,e2,e3) ->
+      if (to_bool (eval_expr env e1)) then
+        eval_expr env e2
+      else
+        eval_expr env e3
+  (*Task 4: String*)
+  
+  (* other expression types unimplemented *)
   | _ -> raise (UnimplementedExpr(e))
 
 
