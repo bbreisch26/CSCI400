@@ -33,8 +33,8 @@ let rec eval (env : environment_t) (p: program_t) : value_t = match p with
 (* evaluate a block *)
 and eval_block (env:environment_t) (p:block_t) : value_t = match p with
   | ReturnBlock(_,e) -> eval_expr env e
-  (* TODO *)
-  | _ -> raise (UnimplementedBlock(p))
+  (* DONE *)
+  | StmtBlock(_,s,b) -> eval_block (eval_stmt env s) b
 
 (* evaluate a statement *)
 and eval_stmt (env:environment_t) (s:stmt_t) : environment_t = match s with
