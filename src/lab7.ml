@@ -28,7 +28,7 @@ let rec eval (env : environment_t) (p: program_t) : value_t = match p with
   (* DONE *)
   | StmtProgram(_,s,p1) -> (* Bind statement to environment and evaluate e *)
      eval (eval_stmt env s) p1
-  | _ -> raise (UnimplementedProgram(p))
+(* | _ -> raise (UnimplementedProgram(p)) (not needed because we cover every possible value of p*)
 
 (* evaluate a block *)
 and eval_block (env:environment_t) (p:block_t) : value_t = match p with
@@ -38,7 +38,7 @@ and eval_block (env:environment_t) (p:block_t) : value_t = match p with
 
 (* evaluate a statement *)
 and eval_stmt (env:environment_t) (s:stmt_t) : environment_t = match s with
-  (* TODO *) (* Ensure Mutable/Immutable is correct *)
+  (* DONE *) (* Ensure Mutable/Immutable is correct *)
   | ConstStmt(_,id, e1) ->
      bind_environment env id Immutable (eval_expr env e1)
  (* | LetStmt(_,id,e1) ->
@@ -59,40 +59,45 @@ and eval_expr (env:environment_t) (e:expr_t) : value_t =
   | BopExpr(_,e1,MinusBop,e2) ->
      NumVal(to_num (eval_expr env e1) -. to_num (eval_expr env e2))
   (* TODO *)
-
-  | VarExpr(p, name) -> (
-    match read_environment env name with
+  (* Variable Expression - look up var name in current environment *)
+  | VarExpr(p, name) ->
+    (match read_environment env name with
     | Some(_, value) -> value
     | None -> raise (UndeclaredVar(name))
     )
   | ValExpr(p,v) -> v
   (* and lambda_t = (ident_t option * typed_ident_t list * block_t * typ_t option)*)
-  | FuncExpr(p,l) -> (*ClosureVal(env, l)*)
-    (
-    match l with
-    | (Some(name), params, block, None) -> ClosureVal(env, l)
-    | (None, params, block, None) -> ClosureVal(env, l)
+  (* Function expression - don't bind to environment (yet)*)
+  | FuncExpr(p,l) ->
+    (match l with
+    | (Some(name), params, block, None) -> ClosureVal(env, l) (*Do something special with named function def*)
+    | (_, params, block, _) -> ClosureVal(env, l)
     )
+  (* Function call - bind a function (ClosureVal) to the environment if it is named *)
   | CallExpr(p, name, vals) ->
      let func = eval_expr env name in
      (match func with
       | ClosureVal(insideEnv,l) ->
          (match (l) with
-          | (Some(name), args, block, None) ->
+          | (Some(name), args, block, _) ->
              let funcEnv = (bind_environment env name Immutable func) in
              (eval_block (bind_args funcEnv args vals)  block)
-          | (None, args, block, None) -> eval_block (bind_args insideEnv args vals) block)
-      | _ -> raise(InvalidCall(name)))
+          (* Anonymous function, no name to find to Env *)
+          | (None, args, block, _) -> eval_block (bind_args insideEnv args vals) block
+         )
+      | _ -> raise(InvalidCall(name))
+     )
 
 
-  (* lab 6 code: *)
+  (* Lab 6 Code below w/ env added to any eval_expr *)
+  (* Unary Operators *)
   | UopExpr(_,NotUop,e1) ->
     BoolVal(not (to_bool (eval_expr env e1)))
   | UopExpr(_,NegUop,e1) ->
       NumVal(-. (to_num (eval_expr env e1)))
   | UopExpr(_,PosUop,e1) ->
-      NumVal(+. (to_num (eval_expr env e1)))
-  (* Binary operators *)
+     NumVal(+. (to_num (eval_expr env e1)))
+  (* Binary Operators *)
   | BopExpr(_,e1,PlusBop,e2) ->
     (let eval_e1 = eval_expr env e1 in
       let eval_e2 = eval_expr env e2 in
@@ -158,17 +163,14 @@ and eval_expr (env:environment_t) (e:expr_t) : value_t =
       (match (to_bool (eval_expr env e1), eval_expr env e2) with
       | (true, v2) -> eval_expr env e1 
       | (false, v2) -> eval_expr env e2)
-  (* Task 2: console.log *)
   | PrintExpr(_,e) ->
       print_endline ( to_str (eval_expr env e));
       UndefVal
-  (* Task 3: conditional *)
   | IfExpr(_,e1,e2,e3) ->
       if (to_bool (eval_expr env e1)) then
         eval_expr env e2
       else
         eval_expr env e3
-  (*Task 4: String*)
   
   (* other expression types unimplemented *)
   | _ -> raise (UnimplementedExpr(e))
