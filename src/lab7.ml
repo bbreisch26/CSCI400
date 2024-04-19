@@ -47,13 +47,13 @@ and eval_stmt (env:environment_t) (s:stmt_t) : environment_t = match s with
      bind_environment env (to_str (eval_expr env e1)) Mutable (eval_expr env e2) *)
   | _ -> raise (UnimplementedStmt(s))
 
-and eval_args (env:environment_t) (names: typed_ident_t list) (vals: expr_t list) =
+and bind_args (env:environment_t) (names: typed_ident_t list) (vals: expr_t list) =
   match (names, vals) with
-  | (((fn,_)::rn),(fv::rv)) -> eval_args (bind_environment env fn Immutable (eval_expr env fv)) rn rv
+  | (((fn,_)::rn),(fv::rv)) -> bind_args (bind_environment env fn Immutable (eval_expr env fv)) rn rv
   | _ -> env
 (* evaluate a value *)
 and eval_expr (env:environment_t) (e:expr_t) : value_t =
-  (*Printf.printf "%s %s\n" (str_expr e) (str_environment_simple env);*)
+  (* Printf.printf "%s %s\n" (str_expr e) (str_environment_simple env); *)
   match e with
   | BlockExpr(p,b) -> eval_block env b
   | BopExpr(_,e1,MinusBop,e2) ->
@@ -74,10 +74,14 @@ and eval_expr (env:environment_t) (e:expr_t) : value_t =
     | (None, params, block, None) -> ClosureVal(env, l)
     )
   | CallExpr(p, name, vals) ->
-     (match eval_expr env name with
+     let func = eval_expr env name in
+     (match func with
       | ClosureVal(insideEnv,l) ->
          (match (l) with
-          | (_, args, block, None) -> (eval_block (eval_args insideEnv args vals)  block))
+          | (Some(name), args, block, None) ->
+             let funcEnv = (bind_environment env name Immutable func) in
+             (eval_block (bind_args funcEnv args vals)  block)
+          | (None, args, block, None) -> eval_block (bind_args insideEnv args vals) block)
       | _ -> raise(InvalidCall(name)))
 
 
