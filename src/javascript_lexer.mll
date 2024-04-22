@@ -16,8 +16,7 @@
 
 let digit = ['0' - '9']
 let digit1 = ['1' - '9']
-let exponent = ['e' 'E'] ['+' '-']? digit +
-
+let exponent = ['e' 'E'] ['+' '-']? digit+
 (* The type "token" is defined in Javascript_parser.mli *)
 rule token = parse
   (* Comments *)
@@ -86,15 +85,14 @@ rule token = parse
   (* - decimal: e.g., 1, 10 *)
   | ['0'-'9']+
   (* - binary: e.g., 0b1, 0B10 *)
-  | ("0b" | "0B") ['0'-'1']+
+  | "0" ("b" | "B") ['0'-'1']+
   (* - octal: e.g., 0o1, 0O17 *)
-  | ("0o" | "0O") ['0' - '7']+
+  | "0" ("o" | "O") ['0' - '7']+
   (* - hexadecimal: e.g., 0x1, 0Xff, 0x10aAfF *)
-  | ("0x" | "0X") ['0'-'9' 'a'-'f' 'A'-'F']+
+  | "0" ("x" | "X") ['0'-'9' 'a'-'f' 'A'-'F']+
   (* - floating point: e.g., 123., 123.456, .123 *)
-  | ['0'-'9']* '.' ['0'-'9']*
   (* - scientific notation: e.g., 123e5, 123.E5, 123.456e-5, .123e100 *)
-  | ['0'-'9']* '.'? ['0'-'9']* exponent
+  | (['1'-'9']['0'-'9']* exponent | (['1'-'9']['0'-'9']* '.' | '0' '.' | '.' ['0'-'9']) ['0'-'9']* (exponent?))
    as x {NUMBER(js_float_of_string x )}
 
   (* End Numbers  *)
