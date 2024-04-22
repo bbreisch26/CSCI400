@@ -79,7 +79,8 @@ and eval_expr (e:expr_t) : value_t =  match e with
       match (eval_e1, eval_e2) with
       | (StrVal(_), StrVal(_))
       | (NumVal(_), NumVal(_))
-      | (BoolVal(_), BoolVal(_)) -> BoolVal(eval_e1 = eval_e2)
+      | (BoolVal(_), BoolVal(_))
+      | (UndefVal, UndefVal) -> BoolVal(eval_e1 = eval_e2)
       | _ -> BoolVal(false)) (* Types must be different in this case - false *)
   (* Strict inequality always returns true with differing types *)
   | BopExpr(_,e1,NeqBop,e2) ->
@@ -88,7 +89,8 @@ and eval_expr (e:expr_t) : value_t =  match e with
       match (eval_e1, eval_e2) with
       | (StrVal(_), StrVal(_))
       | (NumVal(_), NumVal(_))
-      | (BoolVal(_), BoolVal(_)) -> BoolVal(eval_e1 <> eval_e2)
+      | (BoolVal(_), BoolVal(_))
+      | (UndefVal, UndefVal)-> BoolVal(eval_e1 <> eval_e2)
       | _ -> BoolVal(true)) (* Types must be different in this case - !false = true *)
   | BopExpr(_,e1,LtBop,e2) ->
      (let eval_e1 = eval_expr e1 in
