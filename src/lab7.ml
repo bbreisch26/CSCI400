@@ -230,7 +230,9 @@ let simple_var_eval_tests =
 let var_eval_tests =
   test_group "Variable Evaluation"
     [
-      (* TODO *)
+      (None, "const x = true; x + 1", Ok(NumVal(2.0)));
+      (* Despite const being immutable, we allow redefinition *)
+      (None, "const x = 1; const x = 2; x + 1", Ok(NumVal(3.0)));
     ]
 
 
@@ -307,4 +309,5 @@ let call_eval_tests =
     [
       (* TODO *)
       (Some("fib"), Printf.sprintf "(%s)(30)" fib_js, Ok(NumVal(832040.0)));
+      (Some("Lexical Scope"), "const x = 5; const f = function(y){ return x + y; }; (function(z) {const x = 7; return f(6); })(0)", Ok(NumVal(11.0)));
     ]
