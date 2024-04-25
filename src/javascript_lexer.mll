@@ -107,7 +107,7 @@ rule token = parse
   (* see w3 schools article on javascript variables*)
   (* case sensitive, can contain letters, digits, underscores, and dollar signs*)
   (* must begin with letter, dollar sign, or underscore *)
-  | (('$' | '_' | ['a'-'z' 'A'-'Z']) ['a'-'z' 'A'-'Z' '$' '_' '1'-'9']*)
+  | (('$' | '_' | ['a'-'z' 'A'-'Z']) ['a'-'z' 'A'-'Z' '$' '_' '0'-'9']*)
      as x {IDENT(x)}
 
   (* End of File *)
