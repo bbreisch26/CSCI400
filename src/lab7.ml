@@ -297,16 +297,23 @@ let func_eval_tests =
                           ReturnBlock(NoPos,BopExpr(NoPos,VarExpr(NoPos,"x"),
                                       PlusBop,VarExpr(NoPos,"y"))),
                 None))));
-       (None, fib_js,
+      (Some("fib"), fib_js,
        Ok(ClosureVal(StringMap.empty,(
                 Some("fib"),
-                [("n",None)],
-                ReturnBlock(NoPos,IfExpr(NoPos,
-                                         BopExpr(NoPos,VarExpr(NoPos,"x"),LteBop,ValExpr(NoPos,NumVal(0.0))),
-                                         ValExpr(NoPos,NumVal(0.0)),
-                                         BopExpr(NoPos,VarExpr(NoPos,"n"),TimesBop,CallExpr(NoPos,VarExpr(NoPos,"fib"),[BopExpr(NoPos,VarExpr(NoPos,"n"),MinusBop,ValExpr(NoPos,NumVal(1.0)))]))
-                  )),
-                None))));(**)
+                [("x",None)],
+                          ReturnBlock(NoPos,IfExpr(NoPos, 
+                            BopExpr(NoPos,VarExpr(NoPos,"x"), LteBop,ValExpr(NoPos,NumVal(0.0))),
+                            ValExpr(NoPos,NumVal(0.0)),
+                            IfExpr(NoPos,
+                              BopExpr(NoPos,VarExpr(NoPos,"x"),EqBop,ValExpr(NoPos,NumVal(1.0))),
+                              ValExpr(NoPos,NumVal(1.0)),
+                              BopExpr(NoPos,
+                                CallExpr(NoPos,VarExpr(NoPos,"fib"),[BopExpr(NoPos,VarExpr(NoPos,"x"),
+                                         MinusBop,ValExpr(NoPos,NumVal(1.0)))]),
+                                PlusBop,
+                                CallExpr(NoPos,VarExpr(NoPos,"fib"),[BopExpr(NoPos,VarExpr(NoPos,"x"),
+                                         MinusBop,ValExpr(NoPos,NumVal(2.0)))]))))),
+  None))));(**)
       
     ]
 
@@ -329,6 +336,9 @@ let call_eval_tests =
       (Some("fib"), Printf.sprintf "(%s)(30)" fib_js, Ok(NumVal(832040.0)));
       (Some("Lexical Scope"), "const x = 5; const f = function(y){ return x + y; }; (function(z) {const x = 7; return f(6); })(0)", Ok(NumVal(11.0)));
       (Some("fact"), Printf.sprintf "(%s)(5)" fact_js, Ok(NumVal(120.0)));
-      (*Need 3 more tests from here*)
-      (Some("Basic"), "const f = function(x){ return x + 1; }; const r = f(2); r + 3", Ok(NumVal(6.0)));
+      
+      (Some("basic"), "const f = function(x){ return x + 1; }; const r = f(2); r + 3", Ok(NumVal(6.0)));
+      (Some("nest"), "const sum = function(x, y) { return x + y; }; const double = function(x) { return x * 2; }; double(sum(2, 3))", Ok(NumVal(10.0)));
+      (Some("bool"), "const a = true; a", Ok(BoolVal(true)));
+      (Some("bool fun"), "const isTrue = function(a) { return a === true; }; isTrue(true)", Ok(BoolVal(true)));
     ]
