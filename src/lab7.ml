@@ -79,13 +79,13 @@ and eval_expr (env:environment_t) (e:expr_t) : value_t =
   | CallExpr(p, name, vals) ->
      let func = eval_expr env name in
      (match func with
-      | ClosureVal(insideEnv,l) ->
+      | ClosureVal(defEnv,l) ->
          (match (l) with
           | (Some(name), args, block, _) ->
-             let funcEnv = (bind_environment insideEnv name Immutable func) in
+             let funcEnv = (bind_environment defEnv name Immutable func) in
              (eval_block (bind_args funcEnv env args vals)  block)
           (* Anonymous function, no name to find to Env *)
-          | (None, args, block, _) -> eval_block (bind_args insideEnv env args vals) block
+          | (None, args, block, _) -> eval_block (bind_args defEnv env args vals) block
          )
       | _ -> raise(InvalidCall(name))
      )
@@ -340,6 +340,7 @@ let call_eval_tests =
       (* TODO *)
       (Some("fib"), Printf.sprintf "(%s)(30)" fib_js, Ok(NumVal(832040.0)));
       (Some("Lexical Scope"), "const x = 5; const f = function(y){ return x + y; }; (function(z) {const x = 7; return f(6); })(0)", Ok(NumVal(11.0)));
+      (Some("Lexical Scope Named"), "const x = 5; const f = function foo(y){ return x + y; }; (function goo(z) { const x = 7; return f(6); })(0)", Ok(NumVal(11.0)));
       (Some("fact"), Printf.sprintf "(%s)(5)" fact_js, Ok(NumVal(120.0)));
       
       (Some("basic"), "const f = function(x){ return x + 1; }; const r = f(2); r + 3", Ok(NumVal(6.0)));
