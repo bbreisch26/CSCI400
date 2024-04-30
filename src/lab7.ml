@@ -235,6 +235,8 @@ let var_eval_tests =
       (None, "const x = 1; const x = 2; x + 1", Ok(NumVal(3.0)));
       (None, "const x = 0; const y = 10; x + y", Ok(NumVal(10.0)));
       (None, "const x = undefined; const y = undefined; x === y", Ok(BoolVal(true)));
+      (None, "const x = 1; const y = 2; const z = 3; x + y + z", Ok(NumVal(6.0)));
+      (None, "const x=1; const y=2; x + y", Ok(NumVal(3.0)));
     ]
 
 
@@ -286,8 +288,7 @@ let simple_func_eval_tests =
 
     ]
 (* note - you can use the following to print a program for debugging *)
-(* let _ = Printf.printf "RESULT = %s\n" (str_program (parse_string "const x = 1 + 1; x * 2")) *)
-
+(* let _ = Printf.printf "RESULT = %s\n" (str_program (parse_string "const x = 1 + 1; x * 2")*)
 let func_eval_tests =
   test_group "Function Definition Evaluation"
     [
@@ -298,7 +299,7 @@ let func_eval_tests =
                 [("x",None); ("y",None)],
                           ReturnBlock(NoPos,BopExpr(NoPos,VarExpr(NoPos,"x"),
                                       PlusBop,VarExpr(NoPos,"y"))),
-                None))));
+                          None))));
       (Some("fib"), fib_js,
        Ok(ClosureVal(StringMap.empty,(
                 Some("fib"),
@@ -343,4 +344,5 @@ let call_eval_tests =
       (Some("nest"), "const sum = function(x, y) { return x + y; }; const double = function(x) { return x * 2; }; double(sum(2, 3))", Ok(NumVal(10.0)));
       (Some("bool"), "const a = true; a", Ok(BoolVal(true)));
       (Some("bool fun"), "const isTrue = function(a) { return a === true; }; isTrue(true)", Ok(BoolVal(true)));
+      (Some("edge"), "const f = function fib(x) { const fib = 3; return fib;}; f(1)", Ok(NumVal(3.0)));
     ]
