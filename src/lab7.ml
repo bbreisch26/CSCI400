@@ -47,9 +47,11 @@ and eval_stmt (env:environment_t) (s:stmt_t) : environment_t = match s with
      bind_environment env (to_str (eval_expr env e1)) Mutable (eval_expr env e2) *)
   | _ -> raise (UnimplementedStmt(s))
 
-and bind_args (env:environment_t) (names: typed_ident_t list) (vals: expr_t list) =
-  match (names, vals) with
-  | (((fn,_)::rn),(fv::rv)) -> bind_args (bind_environment env fn Immutable (eval_expr env fv)) rn rv
+(* Binds arguments to env based on arguments and their corresponding expressions *)
+(* Expressions are evaluated using the outer environment *)
+and bind_args (env:environment_t) (defenv: environment_t) (names: typed_ident_t list) (exps: expr_t list) =
+  match (names, exps) with
+  | (((fn,_)::rn),(efirst::erest)) -> bind_args (bind_environment env fn Immutable (eval_expr defenv efirst)) defenv rn erest
   | _ -> env
 (* evaluate a value *)
 and eval_expr (env:environment_t) (e:expr_t) : value_t =
@@ -80,10 +82,10 @@ and eval_expr (env:environment_t) (e:expr_t) : value_t =
       | ClosureVal(insideEnv,l) ->
          (match (l) with
           | (Some(name), args, block, _) ->
-             let funcEnv = (bind_environment env name Immutable func) in
-             (eval_block (bind_args funcEnv args vals)  block)
+             let funcEnv = (bind_environment insideEnv name Immutable func) in
+             (eval_block (bind_args funcEnv env args vals)  block)
           (* Anonymous function, no name to find to Env *)
-          | (None, args, block, _) -> eval_block (bind_args insideEnv args vals) block
+          | (None, args, block, _) -> eval_block (bind_args insideEnv env args vals) block
          )
       | _ -> raise(InvalidCall(name))
      )
