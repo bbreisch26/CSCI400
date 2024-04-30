@@ -233,6 +233,8 @@ let var_eval_tests =
       (None, "const x = true; x + 1", Ok(NumVal(2.0)));
       (* Despite const being immutable, we allow redefinition *)
       (None, "const x = 1; const x = 2; x + 1", Ok(NumVal(3.0)));
+      (None, "const x = 0; const y = 10; x + y", Ok(NumVal(10.0)));
+      (None, "const x = undefined; const y = undefined; x === y", Ok(BoolVal(true)));
     ]
 
 
